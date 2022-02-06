@@ -32,11 +32,15 @@ client.on("messageCreate", function(message) {
     .setDescription('These are 5 upcoming conferences')
     .setThumbnail('https://i.imgur.com/eBiE8DT.png')
     .addFields(
-        { name: doc[0].title+" held on "+doc[0].date, value: doc[0].link, inline: true },
-        { name: doc[1].title+" held on "+doc[1].date, value: doc[1].link, inline: true },
-        { name: doc[2].title+" held on "+doc[2].date, value: doc[2].link, inline: true },
-        { name: doc[3].title+" held on "+doc[3].date, value: doc[3].link, inline: true },
-        { name: doc[4].title+" held on "+doc[4].date, value: doc[4].link, inline: true },
+        { name: doc[0].title+" held from "+doc[0].date, value: doc[0].link, inline: false },
+        { name: '\u200B', value: '\u200B' },
+        { name: doc[1].title+" held from "+doc[1].date, value: doc[1].link, inline: false },
+        { name: '\u200B', value: '\u200B' },
+        { name: doc[2].title+" held from "+doc[2].date, value: doc[2].link, inline: false },
+        { name: '\u200B', value: '\u200B' },
+        { name: doc[3].title+" held from "+doc[3].date, value: doc[3].link, inline: false },
+        { name: '\u200B', value: '\u200B' },
+        { name: doc[4].title+" held from "+doc[4].date, value: doc[4].link, inline: false },
         // { name: '\u200B', value: '\u200B' },
     )
     .setTimestamp()
