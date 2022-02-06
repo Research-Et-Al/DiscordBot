@@ -13,7 +13,12 @@ client.on("messageCreate", function(message) {
     if (command === "ping") {
         const timeTaken = Date.now() - message.createdTimestamp;
         message.reply(`Hello! This message had a latency of ${timeTaken}ms.`);                    
-    }                                  
+    }      
+    else if (command === "test") {
+       const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
+       channel.send(message.author.username + " has tested the bot!");
+    }                            
 }); 
 
 client.login(process.env.BOT_TOKEN);
+
