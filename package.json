@@ -1,0 +1,26 @@
+{
+  "name": "discordbot",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anirudhlakhotia/DiscordBot.git"
+  },
+  "keywords": [
+    "discord"
+  ],
+  "author": "Anirudh Lakhotia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anirudhlakhotia/DiscordBot/issues"
+  },
+  "homepage": "https://github.com/anirudhlakhotia/DiscordBot#readme",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0"
+  }
+}
