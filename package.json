@@ -21,6 +21,8 @@
   "homepage": "https://github.com/anirudhlakhotia/DiscordBot#readme",
   "dependencies": {
     "discord.js": "^13.6.0",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.0"
   }
 }

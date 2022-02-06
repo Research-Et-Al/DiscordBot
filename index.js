@@ -2,7 +2,11 @@ const Discord = require("discord.js");
 const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
 const prefix="!";
 const dotenv = require('dotenv').config()
-
+const yaml = require('js-yaml');
+const fs   = require('fs');
+const doc = yaml.load(fs.readFileSync('./conferences.yml', 'utf8'));
+doc.sort((a, b) => (Date.parse(a.deadline)) - Date.parse((b.deadline)));
+const { MessageEmbed } = require('discord.js');
 
 client.on("messageCreate", function(message) { 
     if (message.author.bot) return;
@@ -17,7 +21,29 @@ client.on("messageCreate", function(message) {
     else if (command === "test") {
        const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
        channel.send(message.author.username + " has tested the bot!");
-    }                            
+    }     
+    else if (command === "conferences") {
+        const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
+        // inside a command, event listener, etc.
+    const exampleEmbed = new MessageEmbed()
+    .setColor('#0099ff')
+    .setTitle('Upcoming Conferences')
+    .setURL('https://discord.js.org/')
+    .setDescription('These are 5 upcoming conferences')
+    .setThumbnail('https://i.imgur.com/eBiE8DT.png')
+    .addFields(
+        { name: doc[0].title+" held on "+doc[0].date, value: doc[0].link, inline: true },
+        { name: doc[1].title+" held on "+doc[1].date, value: doc[1].link, inline: true },
+        { name: doc[2].title+" held on "+doc[2].date, value: doc[2].link, inline: true },
+        { name: doc[3].title+" held on "+doc[3].date, value: doc[3].link, inline: true },
+        { name: doc[4].title+" held on "+doc[4].date, value: doc[4].link, inline: true },
+        // { name: '\u200B', value: '\u200B' },
+    )
+    .setTimestamp()
+    .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+    channel.send({ embeds: [exampleEmbed] });
+        }                       
 }); 
 
 client.login(process.env.BOT_TOKEN);
