@@ -31,12 +31,13 @@ app.get("/blog", function(req,res) {
     .setColor('#8c52ff')
     .setTitle('New Blog Post')
     .setDescription('Newly Posted Blog!')
-    .setThumbnail(req.query.blogURL)
+    .setThumbnail(req.query.blogImg)
     .addFields(
         { name: req.query.blogName, value: req.query.blogContent, inline: false },
         // { name: '\u200B', value: '\u200B' },
     )
     .setTimestamp()
+    .setURL(req.query.blogURL)
     .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
     channel.send({ embeds: [blogEmbed] });
   });
