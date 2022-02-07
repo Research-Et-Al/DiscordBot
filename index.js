@@ -14,38 +14,95 @@ const puppeteer = require('puppeteer');
 var loaded= false;
 let social_papers=[];
 let top_5_social_papers=[];
+let latest_papers=[];
+let top_5_latest_papers=[];
+let greatest_papers=[];
+let top_5_greatest_papers=[];
+let trending_papers=[];
+let top_5_trending_papers=[];
 
-const scrap = async () =>{
-    const browser = await puppeteer.launch({headless : true});
-    const page = await browser.newPage();
-    await page.goto('https://paperswithcode.com/top-social', {waitUntil : 'domcontentloaded'}) // navigate to url and wait for page loading
+function scrap_data(query){
+    const scrap = async () =>{
+        const browser = await puppeteer.launch({headless : true});
+        const page = await browser.newPage();
+        await page.goto('https://paperswithcode.com'+query, {waitUntil : 'domcontentloaded'}) // navigate to url and wait for page loading
+        
+        const result = await page.evaluate(() => {
     
-    const result = await page.evaluate(() => {
+           return document.querySelector('.home-page').innerText.split("\n").filter(x => x!=' ' && x!= '')
+        });
+        await browser.close();
+        return result;
+    
+    }
+    scrap().then(arr => {
+    
+        const res = [];
+        var temp=[];
+    if (query === "/top-social"){
+        for (let i = 0; i < arr.length; i += 1) {
+            if (arr[i] == 'TWEETS') {
+                res.push(temp);
+                temp = [];
+            }
+            else{
+                temp.push(arr[i]);
+            }
+        }
+        social_papers=res;
+        top_5_social_papers=social_papers.slice(0,5);
+        loaded=true;
+    }
+    else if (query === "/latest"){
+        for (let i = 0; i < arr.length; i += 1) {
+            if (arr[i] == ' Code') {
+                res.push(temp);
+                temp = [];
+            }
+            else{
+                temp.push(arr[i]);
+            }
+        }
 
-       return document.querySelector('.home-page').innerText.split("\n").filter(x => x!=' ' && x!= '')
-    });
-    await browser.close();
-    return result;
+        latest_papers=res;
+        top_5_latest_papers=latest_papers.slice(0,5);
+        loaded=true;
 
-}
-scrap().then(arr => {
-
-    const res = [];
-    var temp=[];
-    for (let i = 0; i < arr.length; i += 1) {
-        if (arr[i] == 'TWEETS') {
-            res.push(temp);
-            temp = [];
+    }
+    else if (query === "/greatest" || query === "/latest" || query === "/"){
+        for (let i = 0; i < arr.length; i += 1) {
+            if (arr[i] == ' Code') {
+                res.push(temp);
+                temp = [];
+            }
+            else{
+                temp.push(arr[i]);
+            }
+        }
+        if(query === "/latest"){
+        latest_papers=res;
+        top_5_latest_papers=latest_papers.slice(0,5);
+        loaded=true;
+        }
+        else if(query === "/greatest"){
+        greatest_papers=res;
+        top_5_greatest_papers=greatest_papers.slice(0,5);
+        loaded=true;
         }
         else{
-            temp.push(arr[i]);
+        trending_papers=res;
+        top_5_trending_papers=trending_papers.slice(0,5);
+        loaded=true;
         }
-    }
-    social_papers=res;
-    top_5_social_papers=social_papers.slice(0,5);
-    loaded=true;
-});
 
+    }
+
+    });
+}
+scrap_data("/top-social");
+scrap_data("/latest");
+scrap_data("/greatest");
+scrap_data("/");
 app.use(bodyParser.urlencoded({
     extended:true
 }));
@@ -85,7 +142,10 @@ client.on("messageCreate", function(message) {
     if (message.author.bot) return;
     var msgtok = message.content.toLowerCase().split(" ");
     var command= msgtok[1]
-    if (!msgtok[0] == prefix) return;
+    if (msgtok[0] != prefix){
+        return;
+    }
+    
     // const commandBody = message.content.slice(prefix.length);
     // const args = commandBody.split(' ');
     // const command = args.shift().toLowerCase();   
@@ -131,13 +191,13 @@ client.on("messageCreate", function(message) {
     else if (command === "linkedin") {
         channel.send("https://www.linkedin.com/company/pesu-research-et-al/");
     }
-    else if (command === "social"){
+    else if (command === "hot"){
         //Have to add links to each of these
         if (loaded){
             const exampleEmbed = new MessageEmbed()
             .setColor('#8c52ff')
-            .setTitle('Top 5 Social Papers')
-            .setDescription('These are the top 5 social papers')
+            .setTitle('Hot Research on Social Media')
+            .setDescription('These are the top 5 🔥 papers on social media')
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
                 { name: top_5_social_papers[0][0], value: top_5_social_papers[0][2], inline: false },
@@ -158,6 +218,107 @@ client.on("messageCreate", function(message) {
             
             
         }
+
+        else{
+            channel.send("Loading...");
+        }
+    }
+    else if (command === "new"){
+        //Have to add links to each of these
+        if (loaded){
+            const exampleEmbed = new MessageEmbed()
+            .setColor('#8c52ff')
+            .setTitle('Latest Research Papers')
+            .setDescription('These are the top 5 newest papers')
+            .setThumbnail('https://i.imgur.com/eBiE8DT.png')
+            .addFields(
+                { name: top_5_latest_papers[0][0], value: top_5_latest_papers[0][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_latest_papers[1][0], value: top_5_latest_papers[1][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_latest_papers[2][0], value: top_5_latest_papers[2][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_latest_papers[3][0], value: top_5_latest_papers[3][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_latest_papers[4][0], value: top_5_latest_papers[4][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+
+            )
+            .setTimestamp()
+            .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+            channel.send({ embeds: [exampleEmbed] });
+            
+            
+        }
+        
+        else{
+            channel.send("Loading...");
+        }
+
+    }
+    else if (command === "greatest"){
+        //Have to add links to each of these
+        if (loaded){
+            const exampleEmbed = new MessageEmbed()
+            .setColor('#8c52ff')
+            .setTitle('Greatest Research Papers')
+            .setDescription('These are the top 5 greatest papers 🐐')
+            .setThumbnail('https://i.imgur.com/eBiE8DT.png')
+            .addFields(
+                { name: top_5_greatest_papers[0][0], value: top_5_greatest_papers[0][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_greatest_papers[1][0], value: top_5_greatest_papers[1][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_greatest_papers[2][0], value: top_5_greatest_papers[2][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_greatest_papers[3][0], value: top_5_greatest_papers[3][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_greatest_papers[4][0], value: top_5_greatest_papers[4][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+
+            )
+            .setTimestamp()
+            .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+            channel.send({ embeds: [exampleEmbed] });
+            
+            
+        }
+        
+        else{
+            channel.send("Loading...");
+        }
+    }
+    else if (command === "trending"){
+        //Have to add links to each of these
+        if (loaded){
+            const exampleEmbed = new MessageEmbed()
+            .setColor('#8c52ff')
+            .setTitle('Trending Research Papers')
+            .setDescription('These are the top 5 trending papers')
+            .setThumbnail('https://i.imgur.com/eBiE8DT.png')
+            .addFields(
+                { name: top_5_trending_papers[0][0], value: top_5_trending_papers[0][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_trending_papers[1][0], value: top_5_trending_papers[1][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_trending_papers[2][0], value: top_5_trending_papers[2][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_trending_papers[3][0], value: top_5_trending_papers[3][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+                { name: top_5_trending_papers[4][0], value: top_5_trending_papers[4][2], inline: false },
+                { name: '\u200B', value: '\u200B' },
+
+            )
+            .setTimestamp()
+            .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+            channel.send({ embeds: [exampleEmbed] });
+            
+            
+        }
+        
         else{
             channel.send("Loading...");
         }
