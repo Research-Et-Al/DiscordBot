@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
 const { MessageEmbed } = require('discord.js');
-const prefix="*";
+const prefix="ylc";
 const dotenv = require('dotenv').config()
 const yaml = require('js-yaml');
 const fs   = require('fs');
@@ -49,10 +49,12 @@ app.get("/blog", function(req,res) {
 
 client.on("messageCreate", function(message) { 
     if (message.author.bot) return;
-    if (!message.content.startsWith(prefix)) return;
-    const commandBody = message.content.slice(prefix.length);
-    const args = commandBody.split(' ');
-    const command = args.shift().toLowerCase();   
+    var msgtok = message.content.toLowerCase().split(" ");
+    var command= msgtok[1]
+    if (!msgtok[0] == prefix) return;
+    // const commandBody = message.content.slice(prefix.length);
+    // const args = commandBody.split(' ');
+    // const command = args.shift().toLowerCase();   
     const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
     if (command === "ping") {
         const timeTaken = Date.now() - message.createdTimestamp;
