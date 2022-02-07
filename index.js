@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
 const { MessageEmbed } = require('discord.js');
-const prefix="!";
+const prefix="*";
 const dotenv = require('dotenv').config()
 const yaml = require('js-yaml');
 const fs   = require('fs');
@@ -23,6 +23,25 @@ app.get("/", function() {
     const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
     channel.send("This is an automated message sent from port "+ process.env.PORT);
   });
+
+app.get("/blog", function(req,res) {
+    console.log(req.query)
+    const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
+    const blogEmbed = new MessageEmbed()
+    .setColor('#8c52ff')
+    .setTitle('New Blog Post')
+    .setDescription('Newly Posted Blog!')
+    .setThumbnail(req.query.blogURL)
+    .addFields(
+        { name: req.query.blogName, value: req.query.blogContent, inline: false },
+        // { name: '\u200B', value: '\u200B' },
+    )
+    .setTimestamp()
+    .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+    channel.send({ embeds: [blogEmbed] });
+  });
+
+  
 
 
 
