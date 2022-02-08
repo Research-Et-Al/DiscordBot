@@ -28,21 +28,36 @@ function scrap_data(query){
         await page.goto('https://paperswithcode.com'+query, {waitUntil : 'domcontentloaded'}) // navigate to url and wait for page loading
         
         const result = await page.evaluate(() => {
-    
-           return document.querySelector('.home-page').innerText.split("\n").filter(x => x!=' ' && x!= '')
+            hrefs_list=[... new Set(Array.from(
+                document.querySelectorAll('.badge-light'),
+                a => a.getAttribute('href')
+              ))];
+              for(i=0;i<hrefs_list.length;i++){
+                hrefs_list[i]='https://paperswithcode.com'+hrefs_list[i].split("#")[0]
+              }
+              
+            hrefs_list=[...new Set(hrefs_list.filter(a=>a.includes("/paper/") || a.includes("/search?")))]
+            
+        return {
+               hrefs:hrefs_list,
+               data:document.querySelector('.home-page').innerText.split("\n").filter(x => x!=' ' && x!= '')
+           }
         });
         await browser.close();
         return result;
     
     }
-    scrap().then(arr => {
-    
+    scrap().then(obj => {
+        arr=obj.data;
+        let hrefs_list=obj.hrefs;
         const res = [];
         var temp=[];
     if (query === "/top-social"){
         for (let i = 0; i < arr.length; i += 1) {
             if (arr[i] == 'TWEETS') {
+                temp.push(hrefs_list[0])
                 res.push(temp);
+                hrefs_list=hrefs_list.slice(1);
                 temp = [];
             }
             else{
@@ -56,7 +71,9 @@ function scrap_data(query){
     else if (query === "/latest"){
         for (let i = 0; i < arr.length; i += 1) {
             if (arr[i] == ' Code') {
+                temp.push(hrefs_list[0])
                 res.push(temp);
+                hrefs_list=hrefs_list.slice(1);
                 temp = [];
             }
             else{
@@ -72,7 +89,9 @@ function scrap_data(query){
     else if (query === "/greatest" || query === "/latest" || query === "/"){
         for (let i = 0; i < arr.length; i += 1) {
             if (arr[i] == ' Code') {
+                temp.push(hrefs_list[0])
                 res.push(temp);
+                hrefs_list=hrefs_list.slice(1);
                 temp = [];
             }
             else{
@@ -201,14 +220,19 @@ client.on("messageCreate", function(message) {
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
                 { name: top_5_social_papers[0][0], value: top_5_social_papers[0][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[0].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_social_papers[1][0], value: top_5_social_papers[1][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[1].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_social_papers[2][0], value: top_5_social_papers[2][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[2].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_social_papers[3][0], value: top_5_social_papers[3][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[3].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_social_papers[4][0], value: top_5_social_papers[4][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[4].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
             )
             .setTimestamp()
@@ -233,14 +257,19 @@ client.on("messageCreate", function(message) {
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
                 { name: top_5_latest_papers[0][0], value: top_5_latest_papers[0][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[0].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_latest_papers[1][0], value: top_5_latest_papers[1][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[1].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_latest_papers[2][0], value: top_5_latest_papers[2][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[2].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_latest_papers[3][0], value: top_5_latest_papers[3][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[3].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_latest_papers[4][0], value: top_5_latest_papers[4][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[4].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
 
             )
@@ -267,14 +296,19 @@ client.on("messageCreate", function(message) {
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
                 { name: top_5_greatest_papers[0][0], value: top_5_greatest_papers[0][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[0].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_greatest_papers[1][0], value: top_5_greatest_papers[1][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[1].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_greatest_papers[2][0], value: top_5_greatest_papers[2][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[2].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_greatest_papers[3][0], value: top_5_greatest_papers[3][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[3].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_greatest_papers[4][0], value: top_5_greatest_papers[4][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[4].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
 
             )
@@ -300,14 +334,19 @@ client.on("messageCreate", function(message) {
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
                 { name: top_5_trending_papers[0][0], value: top_5_trending_papers[0][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[0].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_trending_papers[1][0], value: top_5_trending_papers[1][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[1].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_trending_papers[2][0], value: top_5_trending_papers[2][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[2].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_trending_papers[3][0], value: top_5_trending_papers[3][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[3].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
                 { name: top_5_trending_papers[4][0], value: top_5_trending_papers[4][2], inline: false },
+                {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[4].at(-1)+")", inline:false},
                 { name: '\u200B', value: '\u200B' },
 
             )
@@ -333,4 +372,3 @@ client.login(process.env.BOT_TOKEN);
 app.listen(process.env.PORT, function(){
     console.log("The Server is running on port 3000");
   })
-
