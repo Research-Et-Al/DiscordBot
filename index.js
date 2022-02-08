@@ -21,6 +21,16 @@ let top_5_greatest_papers=[];
 let trending_papers=[];
 let top_5_trending_papers=[];
 
+const wyd_responses=[
+    'Search for the orphanage you came from so I can send you back.',
+    'Meditating. Be quiet',
+    'Minding my own business. You should try it.',
+    'Pretending to be invisible',
+    'Changing the config settings for NASA satellites. Same old same old, you know how it is.',
+    'Living the dream.',
+    'Planning to take over the world. You know. The usual.',
+]
+
 function scrap_data(query){
     const scrap = async () =>{
         const browser = await puppeteer.launch({headless : true});
@@ -172,7 +182,12 @@ client.on("messageCreate", function(message) {
     if (command === "ping") {
         const timeTaken = Date.now() - message.createdTimestamp;
         message.reply(`Hello! This message had a latency of ${timeTaken}ms.`);                    
-    }      
+    } 
+    else if (command === "wyd") {
+        // random element from wyd_responses
+        message.reply(wyd_responses[wyd_responses.length * Math.random() | 0]);
+
+    }     
     else if (command === "test") {
        channel.send(message.author.username + " has tested the bot!");
     }     
