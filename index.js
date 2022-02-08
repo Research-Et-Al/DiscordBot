@@ -9,8 +9,7 @@ const express=require('express');
 const app=express();
 const bodyParser = require("body-parser")
 const puppeteer = require('puppeteer');
-
-
+const potd = require("./paperoftheday.json");
 var loaded= false;
 let social_papers=[];
 let top_5_social_papers=[];
@@ -20,7 +19,7 @@ let greatest_papers=[];
 let top_5_greatest_papers=[];
 let trending_papers=[];
 let top_5_trending_papers=[];
-
+let colors=['#FF0000','#FFC000','#FFFC00','#FF0000','#00FFFF','#FF0000']
 const wyd_responses=[
     'Search for the orphanage you came from so I can send you back.',
     'Meditating. Be quiet',
@@ -29,7 +28,62 @@ const wyd_responses=[
     'Changing the config settings for NASA satellites. Same old same old, you know how it is.',
     'Living the dream.',
     'Planning to take over the world. You know. The usual.',
+    'Enslaving humanity one sandwich at a time. Would you like some lunch?',
+    'Inventing time travel. I\'ll let you know how it works out last week.'
+
 ]
+
+function update_paper_of_the_day(write_object){
+    fs.readFile('./paperoftheday.json', (err, data) => {
+        if (err) throw err;
+        var doc = JSON.parse(data);
+        //if the date is not in the file, add it
+        if (doc.findIndex(x => x.date === write_object.date) === -1){
+            doc.push(write_object);
+            fs.writeFile('./paperoftheday.json', JSON.stringify(doc), (err) => {
+                if (err) throw err;
+                console.log('Paper of the day updated!');
+                const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
+                const blogEmbed = new MessageEmbed()
+                //set color to random from colors array
+                .setColor(colors[Math.floor(Math.random() * colors.length)])
+                .setTitle('Paper of the Day 📝 ')
+                .setDescription('The paper of the day is:')
+                .addFields(
+                    { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
+                    { name:'Description', value: doc[doc.findIndex(x => x.date === write_object.date)].description, inline: false},
+                    // { name: '\u200B', value: '\u200B' },
+                )
+                .setTimestamp()
+                .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
+                .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+                channel.send({ embeds: [blogEmbed] });
+            });
+        }
+        //if the date is in the file, send the paper of the day
+        else{
+            console.log("Date already in file!");
+            //create embed for the paper of the day
+            const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
+            const blogEmbed = new MessageEmbed()
+            .setColor(colors[Math.floor(Math.random() * colors.length)])
+            .setTitle('Paper of the Day 📝 ')
+            .setDescription('The paper of the day is:')
+            .addFields(
+                { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
+                { name:'Description', value: doc[doc.findIndex(x => x.date === write_object.date)].description, inline: false},
+                // { name: '\u200B', value: '\u200B' },
+            )
+            .setTimestamp()
+            .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
+            .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+            channel.send({ embeds: [blogEmbed] });
+                
+
+        }
+    })
+}
+
 
 function scrap_data(query){
     const scrap = async () =>{
@@ -141,7 +195,6 @@ let doc = yaml.load(fs.readFileSync('./conferences.yml', 'utf8'));
 doc.sort((a, b) => (Date.parse(a.deadline)) - Date.parse((b.deadline)));
 doc=doc.filter(function(conference){return Date.parse(conference.deadline)>Date.now() && conference.year >= 2022});
 
-
 app.get("/", function() {
     const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
     channel.send("This is an automated message sent from port "+ process.env.PORT);
@@ -183,7 +236,7 @@ client.on("messageCreate", function(message) {
         const timeTaken = Date.now() - message.createdTimestamp;
         message.reply(`Hello! This message had a latency of ${timeTaken}ms.`);                    
     } 
-    else if (command === "wyd") {
+    else if (command === "wyd" || command === "wassup"|| command === "sup") {
         // random element from wyd_responses
         message.reply(wyd_responses[wyd_responses.length * Math.random() | 0]);
 
@@ -214,8 +267,7 @@ client.on("messageCreate", function(message) {
     .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
     channel.send({ embeds: [exampleEmbed] });
-        }          
-        
+        }   
     else if (command === "instagram") {
         channel.send("https://www.instagram.com/etal.pesu/");
     }
@@ -225,7 +277,7 @@ client.on("messageCreate", function(message) {
     else if (command === "linkedin") {
         channel.send("https://www.linkedin.com/company/pesu-research-et-al/");
     }
-    else if (command === "hot"){
+    else if (command === "hot" || command === "🔥") {
         //Have to add links to each of these
         if (loaded){
             const exampleEmbed = new MessageEmbed()
@@ -262,8 +314,7 @@ client.on("messageCreate", function(message) {
             channel.send("Loading...");
         }
     }
-    else if (command === "new"){
-        //Have to add links to each of these
+    else if (command === "new" || command === "latest"){
         if (loaded){
             const exampleEmbed = new MessageEmbed()
             .setColor('#8c52ff')
@@ -301,7 +352,7 @@ client.on("messageCreate", function(message) {
         }
 
     }
-    else if (command === "greatest"){
+    else if (command === "greatest" || command === "goat" || command === "🐐"){
         //Have to add links to each of these
         if (loaded){
             const exampleEmbed = new MessageEmbed()
@@ -376,6 +427,18 @@ client.on("messageCreate", function(message) {
         else{
             channel.send("Loading...");
         }
+    }
+    else if (command === "potd"){
+       chosen_paper=latest_papers[latest_papers.length * Math.random() | 0]
+        write_object={
+            "title":chosen_paper[0],
+            "link":chosen_paper.at(-1),
+            "description":chosen_paper[2],
+            "date":new Date().toLocaleDateString("en-US")
+        }   
+
+        update_paper_of_the_day(write_object);
+
     }
     else{
         channel.send("I'm sorry I didn't quite get that. Please try again.");
