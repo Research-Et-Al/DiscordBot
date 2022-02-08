@@ -143,7 +143,7 @@ app.get("/blog", function(req,res) {
     const blogEmbed = new MessageEmbed()
     .setColor('#8c52ff')
     .setTitle('New Blog Post')
-    .setDescription('Newly Posted Blog!')
+    .setDescription('Oooh\n Looks like we have a new blog post by '+req.query.name+'!')
     .setThumbnail(req.query.blogImg)
     .addFields(
         { name: req.query.blogName, value: req.query.blogContent, inline: false },
