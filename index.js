@@ -10,6 +10,7 @@ const app=express();
 const bodyParser = require("body-parser")
 const puppeteer = require('puppeteer');
 const potd = require("./paperoftheday.json");
+const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 var loaded= false;
 let social_papers=[];
 let top_5_social_papers=[];
@@ -19,7 +20,19 @@ let greatest_papers=[];
 let top_5_greatest_papers=[];
 let trending_papers=[];
 let top_5_trending_papers=[];
-let colors=['#FF0000','#FFC000','#FFFC00','#FF0000','#00FFFF','#FF0000']
+let colors=['#FF0000','#FFC000','#FFFC00','#FF0000','#00FFFF','#FF0000','#8c52ff']
+let domains={
+    ML:["Machine Learning","https://i.imgur.com/ZLRhN5e.png"],
+    AI:"Artificial Intelligence",
+    CV:["Computer Vision","https://i.imgur.com/tRGQP7D.png"],
+    RO:["Robotics", "https://i.imgur.com/fF9LVk7.png"],
+    DM:"Data Mining",
+    SP:"Speech Processing",
+    DS:"Data Science",
+    DL:"Deep Learning",
+    NLP:"Natural Language Processing",
+}
+
 const wyd_responses=[
     'Search for the orphanage you came from so I can send you back.',
     'Meditating. Be quiet',
@@ -44,7 +57,7 @@ function update_paper_of_the_day(write_object){
                 if (err) throw err;
                 console.log('Paper of the day updated!');
                 const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
-                const blogEmbed = new MessageEmbed()
+                const potdEmbed = new MessageEmbed()
                 //set color to random from colors array
                 .setColor(colors[Math.floor(Math.random() * colors.length)])
                 .setTitle('Paper of the Day 📝 ')
@@ -57,7 +70,7 @@ function update_paper_of_the_day(write_object){
                 .setTimestamp()
                 .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
                 .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
-                channel.send({ embeds: [blogEmbed] });
+                channel.send({ embeds: [potdEmbed] });
             });
         }
         //if the date is in the file, send the paper of the day
@@ -65,7 +78,7 @@ function update_paper_of_the_day(write_object){
             console.log("Date already in file!");
             //create embed for the paper of the day
             const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
-            const blogEmbed = new MessageEmbed()
+            const potdEmbed = new MessageEmbed()
             .setColor(colors[Math.floor(Math.random() * colors.length)])
             .setTitle('Paper of the Day 📝 ')
             .setDescription('The paper of the day is:')
@@ -77,7 +90,7 @@ function update_paper_of_the_day(write_object){
             .setTimestamp()
             .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
-            channel.send({ embeds: [blogEmbed] });
+            channel.send({ embeds: [potdEmbed] });
                 
 
         }
@@ -85,8 +98,8 @@ function update_paper_of_the_day(write_object){
 }
 
 
-function scrap_data(query){
-    const scrap = async () =>{
+function scrape_data(query){
+    const scrape = async () =>{
         const browser = await puppeteer.launch({headless : true});
         const page = await browser.newPage();
         await page.goto('https://paperswithcode.com'+query, {waitUntil : 'domcontentloaded'}) // navigate to url and wait for page loading
@@ -111,7 +124,7 @@ function scrap_data(query){
         return result;
     
     }
-    scrap().then(obj => {
+    scrape().then(obj => {
         arr=obj.data;
         let hrefs_list=obj.hrefs;
         const res = [];
@@ -182,10 +195,10 @@ function scrap_data(query){
 
     });
 }
-scrap_data("/top-social");
-scrap_data("/latest");
-scrap_data("/greatest");
-scrap_data("/");
+scrape_data("/top-social");
+scrape_data("/latest");
+scrape_data("/greatest");
+scrape_data("/");
 app.use(bodyParser.urlencoded({
     extended:true
 }));
@@ -194,17 +207,16 @@ app.use(bodyParser.urlencoded({
 let doc = yaml.load(fs.readFileSync('./conferences.yml', 'utf8'));
 doc.sort((a, b) => (Date.parse(a.deadline)) - Date.parse((b.deadline)));
 doc=doc.filter(function(conference){return Date.parse(conference.deadline)>Date.now() && conference.year >= 2022});
-
 app.get("/", function() {
     const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
     channel.send("This is an automated message sent from port "+ process.env.PORT);
   });
 
+
 app.get("/blog", function(req,res) {
-    console.log(req.query)
     const channel=client.channels.cache.find(channel => channel.id === process.env.CHANNEL_ID);
     const blogEmbed = new MessageEmbed()
-    .setColor('#8c52ff')
+    .setColor(colors[Math.floor(Math.random() * colors.length)])
     .setTitle('New Blog Post')
     .setDescription('Oooh\n Looks like we have a new blog post by '+req.query.name+'!')
     .setThumbnail(req.query.blogImg)
@@ -220,7 +232,7 @@ app.get("/blog", function(req,res) {
 
   
 
-client.on("messageCreate", function(message) { 
+client.on("messageCreate", async function(message) { 
     if (message.author.bot) return;
     var msgtok = message.content.toLowerCase().split(" ");
     var command= msgtok[1]
@@ -243,10 +255,71 @@ client.on("messageCreate", function(message) {
     }     
     else if (command === "test") {
        channel.send(message.author.username + " has tested the bot!");
+    }
+    else if (command === "domains") {
+		const row = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('select')
+					.setPlaceholder('Nothing selected')
+					.addOptions([
+						{
+							label: 'Machine Learning',
+							description: 'This is a description',
+							value: 'ML',
+						},
+						{
+							label: 'Computer Vision',
+							description: 'This is also a description',
+							value: 'CV',
+						},
+                        {
+                            label: 'Robotics',
+                            description: 'This is also a description',
+                            value: 'RO',
+                        },
+                        // {
+                        //     label: 'Natural Language Processing',
+                        //     description: 'This is also a description',
+                        //     value: 'NLP',
+                        // },
+
+                    //    {
+                    //         label: 'Speech Processing',
+                    //         description: 'This is also a description',
+                    //         value: 'SP',
+                    //    }
+
+					]),
+			);
+
+		message.reply({ content: 'Here\'s a list of domains:', components: [row] });
+
+        client.on("interactionCreate", async interaction=>{
+            if (!interaction.isSelectMenu()) return
+            // console.log(interaction)
+            //get elements from doc if sub is equal to interaction.values[0]
+            const sub=interaction.values[0];
+            const sub_list=doc.filter(function(conference){return conference.sub === sub});
+            conference_embed=new MessageEmbed()
+            .setColor(colors[Math.floor(Math.random() * colors.length)])
+            .setTitle(domains[sub][0])
+            .setDescription('Here are two conferences for '+domains[sub][0]+'!')
+            .setThumbnail(domains[sub][1])
+            .addFields(
+                { name: sub_list[0].title+" held from "+sub_list[0].date, value: sub_list[0].link, inline: false },
+                // { name: '\u200B', value: '\u200B' },
+                { name: sub_list[1].title+" held from "+sub_list[1].date, value: sub_list[1].link, inline: false },
+            )
+           
+            //Here there's an error, and i don't know why it occurs, but catching it stops the program from crashing
+            await interaction.update({ content:'Here are two upcoming conferences for '+domains[sub][0],embeds: [conference_embed], components: [],ephemeral: true }).then().catch(console.error);
+        })
+
     }     
     else if (command === "conferences") {
     // inside a command, event listener, etc.
-    const exampleEmbed = new MessageEmbed()
+    const embed = new MessageEmbed()
     .setColor('#8c52ff')
     .setTitle('Upcoming Conferences')
     .setDescription('These are 5 upcoming conferences')
@@ -266,7 +339,7 @@ client.on("messageCreate", function(message) {
     .setTimestamp()
     .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
-    channel.send({ embeds: [exampleEmbed] });
+    channel.send({ embeds: [embed] });
         }   
     else if (command === "instagram") {
         channel.send("https://www.instagram.com/etal.pesu/");
@@ -280,7 +353,7 @@ client.on("messageCreate", function(message) {
     else if (command === "hot" || command === "🔥") {
         //Have to add links to each of these
         if (loaded){
-            const exampleEmbed = new MessageEmbed()
+            const embed = new MessageEmbed()
             .setColor('#8c52ff')
             .setTitle('Hot Research on Social Media')
             .setDescription('These are the top 5 🔥 papers on social media')
@@ -305,7 +378,7 @@ client.on("messageCreate", function(message) {
             .setTimestamp()
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
-            channel.send({ embeds: [exampleEmbed] });
+            channel.send({ embeds: [embed] });
             
             
         }
@@ -316,7 +389,7 @@ client.on("messageCreate", function(message) {
     }
     else if (command === "new" || command === "latest"){
         if (loaded){
-            const exampleEmbed = new MessageEmbed()
+            const embed = new MessageEmbed()
             .setColor('#8c52ff')
             .setTitle('Latest Research Papers')
             .setDescription('These are the top 5 newest papers')
@@ -342,7 +415,7 @@ client.on("messageCreate", function(message) {
             .setTimestamp()
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
-            channel.send({ embeds: [exampleEmbed] });
+            channel.send({ embeds: [embed] });
             
             
         }
@@ -355,7 +428,7 @@ client.on("messageCreate", function(message) {
     else if (command === "greatest" || command === "goat" || command === "🐐"){
         //Have to add links to each of these
         if (loaded){
-            const exampleEmbed = new MessageEmbed()
+            const embed = new MessageEmbed()
             .setColor('#8c52ff')
             .setTitle('Greatest Research Papers')
             .setDescription('These are the top 5 greatest papers 🐐')
@@ -381,7 +454,7 @@ client.on("messageCreate", function(message) {
             .setTimestamp()
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
-            channel.send({ embeds: [exampleEmbed] });
+            channel.send({ embeds: [embed] });
             
             
         }
@@ -393,7 +466,7 @@ client.on("messageCreate", function(message) {
     else if (command === "trending"){
         //Have to add links to each of these
         if (loaded){
-            const exampleEmbed = new MessageEmbed()
+            const embed = new MessageEmbed()
             .setColor('#8c52ff')
             .setTitle('Trending Research Papers')
             .setDescription('These are the top 5 trending papers')
@@ -419,7 +492,7 @@ client.on("messageCreate", function(message) {
             .setTimestamp()
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
-            channel.send({ embeds: [exampleEmbed] });
+            channel.send({ embeds: [embed] });
             
             
         }
