@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
+const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES","GUILD_MEMBERS"]});
 const { MessageEmbed } = require('discord.js');
 const prefix="ylc";
 const dotenv = require('dotenv').config()
@@ -33,8 +33,11 @@ let domains={
     NLP:"Natural Language Processing",
 }
 
+//Welcome Message
+//Roles
+
 const wyd_responses=[
-    'Search for the orphanage you came from so I can send you back.',
+    'Searching for the orphanage you came from so I can send you back.',
     'Meditating. Be quiet',
     'Minding my own business. You should try it.',
     'Pretending to be invisible',
@@ -230,7 +233,25 @@ app.get("/blog", function(req,res) {
     channel.send({ embeds: [blogEmbed] });
   });
 
-  
+
+  client.on('guildMemberAdd', async member => {
+    
+    console.log('New Member Joined')
+    
+    const welcomeEmbed = new MessageEmbed()
+    // member.roles.add(member.guild.roles.cache.find(role => role.name === 'Computer Vision'))
+
+    welcomeEmbed.setColor('#5cf000')
+    welcomeEmbed.setTitle(member.user.username + ' is now Among Us ' )
+    welcomeEmbed.setDescription('Welcome to the server!')
+    welcomeEmbed.setTimestamp()
+    welcomeEmbed.setImage('https://cdn.mos.cms.futurecdn.net/93GAa4wm3z4HbenzLbxWeQ-650-80.jpg.webp')
+    
+
+    member.guild.channels.cache.find(channel => channel.id === process.env.WELCOME_CHANNEL_ID).send({ embeds: [welcomeEmbed] })
+    
+    
+})
 
 client.on("messageCreate", async function(message) { 
     if (message.author.bot) return;
@@ -255,6 +276,86 @@ client.on("messageCreate", async function(message) {
     }     
     else if (command === "test") {
        channel.send(message.author.username + " has tested the bot!");
+    }
+    else if (command === "roles") {
+        const row = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('select')
+					.setPlaceholder('Nothing selected')
+					.addOptions([
+						{
+							label: 'Machine Learning',
+							description: 'This is a description',
+							value: 'ML',
+						},
+						{
+							label: 'Computer Vision',
+							description: 'This is also a description',
+							value: 'CV',
+						},
+                        {
+                            label: 'Robotics',
+                            description: 'This is also a description',
+                            value: 'RO',
+                        },
+                        // {
+                        //     label: 'Natural Language Processing',
+                        //     description: 'This is also a description',
+                        //     value: 'NLP',
+                        // },
+
+                    //    {
+                    //         label: 'Speech Processing',
+                    //         description: 'This is also a description',
+                    //         value: 'SP',
+                    //    }
+
+					]),
+                    
+			);
+		    message.reply({ content: 'Here\'s a list of roles:', components: [row] });
+
+            client.on("interactionCreate", async interaction=>{
+                if (!interaction.isSelectMenu()) return
+
+                const sub=interaction.values[0];
+                if (sub==="ML"){
+                    
+                    //check if already has role ML
+                    if (message.member.roles.cache.find(role => role.name === 'Machine Learning')){
+                        interaction.update({ content:'You already have the Machine Learning Role!',components: [],ephemeral: true }).then().catch(console.error);
+                    }
+                    else{
+                    //add role ML
+                    message.member.roles.add(message.guild.roles.cache.find(role => role.name === "Machine Learning"));
+                    interaction.update({ content:'Congrats!\n You have been added to the Machine Learning Role!',components: [],ephemeral: true }).then().catch(console.error);
+                }
+            }
+                else if (sub==="CV"){
+                    //check if already has role CV
+                    if (message.member.roles.cache.find(role => role.name === 'Computer Vision')){
+                        interaction.update({ content:'You already have the Computer Vision role!',components: [],ephemeral: true }).then().catch(console.error);
+                    }
+                    else{
+                        //add role CV
+                        message.member.roles.add(message.guild.roles.cache.find(role => role.name === "Computer Vision"));
+                        interaction.update({ content:'Congrats!\n You have been added to the Computer Vision Role!',components: [],ephemeral: true }).then().catch(console.error);
+                    }
+
+                }
+                else if (sub==="RO"){
+                    //check if already has role RO
+                    if (message.member.roles.cache.find(role => role.name === 'Robotics')){
+                        interaction.update({ content:'You already have the Robotics Role!',components: [],ephemeral: true }).then().catch(console.error);
+                    }
+                    else{
+                    //add role RO
+                    message.member.roles.add(message.guild.roles.cache.find(role => role.name === "Robotics"));
+                    interaction.update({ content:'Congrats!\n You have been added to the Robotics Role!',components: [],ephemeral: true }).then().catch(console.error);
+                }
+            }
+            })
     }
     else if (command === "domains") {
 		const row = new MessageActionRow()
@@ -304,7 +405,7 @@ client.on("messageCreate", async function(message) {
             conference_embed=new MessageEmbed()
             .setColor(colors[Math.floor(Math.random() * colors.length)])
             .setTitle(domains[sub][0])
-            .setDescription('Here are two conferences for '+domains[sub][0]+'!')
+            .setDescription('Upcoming Conferences:'+'\n')
             .setThumbnail(domains[sub][1])
             .addFields(
                 { name: sub_list[0].title+" held from "+sub_list[0].date, value: sub_list[0].link, inline: false },
@@ -313,7 +414,7 @@ client.on("messageCreate", async function(message) {
             )
            
             //Here there's an error, and i don't know why it occurs, but catching it stops the program from crashing
-            await interaction.update({ content:'Here are two upcoming conferences for '+domains[sub][0],embeds: [conference_embed], components: [],ephemeral: true }).then().catch(console.error);
+            interaction.update({ content:'Here\'s what I found',embeds: [conference_embed], components: [],ephemeral: true }).then().catch(console.error);
         })
 
     }     
@@ -513,6 +614,7 @@ client.on("messageCreate", async function(message) {
         update_paper_of_the_day(write_object);
 
     }
+
     else{
         channel.send("I'm sorry I didn't quite get that. Please try again.");
     }
