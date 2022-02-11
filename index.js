@@ -614,6 +614,34 @@ client.on("messageCreate", async function(message) {
         update_paper_of_the_day(write_object);
 
     }
+    else if (command === "help"){
+        const embed = new MessageEmbed()
+        .setColor('#8c52ff')
+        .setTitle('Help')
+        .setDescription('These are the commands you can use')
+        .setThumbnail('https://i.imgur.com/eBiE8DT.png')
+        .addFields(
+            { name: '```new or latest``` ', value: 'Gives you top 5 latest research papers', inline: false },
+            { name: '```greatest or goat or 🐐```', value: 'Gives you top 5 greatest research papers of all time', inline: false },
+            { name: '```trending```', value: 'Gives you top 5 trending research papers', inline: false },
+            { name: '```hot or 🔥```', value: 'Gives you top 5 hot research papers on social media', inline: false },
+            { name: '```potd```', value: 'Gives you a random paper of the day', inline: false },
+            { name: '```wyd or sup or wassup```', value: 'Tells you what I\'m doing', inline: false },
+            { name: '```help```', value: 'Gives you this message', inline: false },
+            { name: '```potd```', value: 'Gives you the paper of the day', inline: false },
+            { name: '```roles```', value: 'Choose a role', inline: false },
+            { name: '```domains```', value: 'See two upcoming conferences for a domain', inline: false },
+            { name: '```conferences```', value: 'See five upcoming conferences', inline: false },
+            { name: '```linkedin```', value: 'Get the LinkedIn profile of Research et Al', inline: false },
+            { name: '```github```', value: 'Get the GitHub profile of Research et Al', inline: false },
+            { name: '```instagram```', value: 'Get the Instagram profile of Research et Al', inline: false },
+
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+        channel.send({ embeds: [embed] });
+    }
 
     else{
         channel.send("I'm sorry I didn't quite get that. Please try again.");
