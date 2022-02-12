@@ -34,7 +34,10 @@ let domains={
 }
 
 //Welcome Message
-//Roles
+//Roles by Reaction
+//Slash Commands
+//Wishlist
+//Level Up
 
 const wyd_responses=[
     'Searching for the orphanage you came from so I can send you back.',
@@ -64,6 +67,7 @@ function update_paper_of_the_day(write_object){
                 //set color to random from colors array
                 .setColor(colors[Math.floor(Math.random() * colors.length)])
                 .setTitle('Paper of the Day 📝 ')
+                .setImage('https://i.imgur.com/12abBCa.png')
                 .setDescription('The paper of the day is:')
                 .addFields(
                     { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
@@ -84,6 +88,7 @@ function update_paper_of_the_day(write_object){
             const potdEmbed = new MessageEmbed()
             .setColor(colors[Math.floor(Math.random() * colors.length)])
             .setTitle('Paper of the Day 📝 ')
+            .setImage('https://i.imgur.com/12abBCa.png')
             .setDescription('The paper of the day is:')
             .addFields(
                 { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
@@ -269,6 +274,7 @@ client.on("messageCreate", async function(message) {
         message.reply(`Hello! This message had a latency of ${timeTaken}ms.`);                    
     } 
     else if (command === "wyd" || command === "wassup"|| command === "sup") {
+        // console.log(message.author.id);
         // random element from wyd_responses
         message.reply(wyd_responses[wyd_responses.length * Math.random() | 0]);
 
@@ -276,6 +282,7 @@ client.on("messageCreate", async function(message) {
     else if (command === "test") {
        channel.send(message.author.username + " has tested the bot!");
     }
+
     else if (command === "roles") {
         const row = new MessageActionRow()
 			.addComponents(
@@ -442,13 +449,45 @@ client.on("messageCreate", async function(message) {
     channel.send({ embeds: [embed] });
         }   
     else if (command === "instagram") {
-        channel.send("https://www.instagram.com/etal.pesu/");
+        const embed = new MessageEmbed()
+        .setColor('#8c52ff')
+        .setTitle('Instagram')
+        .setDescription('This is the link to our Instagram page')
+        .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1024px-Instagram_icon.png')
+        .addFields(
+            { name: 'Link', value: 'https://www.instagram.com/research_et_al/', inline: false },
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' }); 
+        channel.send({ embeds: [embed] });
     }
     else if (command === "github") {
-        channel.send("https://github.com/Research-Et-Al");
+        const embed = new MessageEmbed()
+        .setColor('#8c52ff')
+        .setTitle('Github')
+        .setDescription('This is the link to our Github page')
+        .setThumbnail('https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png')
+        .addFields(
+            { name: 'Link', value: 'https://github.com/Research-Et-Al', inline: false },
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+        channel.send({ embeds: [embed] });
+
     }
     else if (command === "linkedin") {
-        channel.send("https://www.linkedin.com/company/pesu-research-et-al/");
+        const embed = new MessageEmbed()
+        .setColor('#8c52ff')
+        .setTitle('Linkedin')
+        .setDescription('This is the link to our Linkedin page')
+        .setThumbnail('https://cdn-icons-png.flaticon.com/512/174/174857.png')
+        .addFields(
+            { name: 'Link', value: 'https://www.linkedin.com/company/pesu-research-et-al/', inline: false },
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+        channel.send({ embeds: [embed] });
+
     }
     else if (command === "hot" || command === "🔥") {
         //Have to add links to each of these
