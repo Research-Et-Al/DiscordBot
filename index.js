@@ -659,6 +659,7 @@ client.on("messageCreate", async function(message) {
         .setDescription('These are the commands you can use')
         .setThumbnail('https://i.imgur.com/HSUAWtg.png')
         .addFields(
+            { name: '```aim or purpose ```', value: 'Wondering what we do at Research et Al?\n Find out here', inline: false },
             { name: '```new or latest``` ', value: 'Gives you top 5 latest research papers', inline: false },
             { name: '```greatest or goat or 🐐```', value: 'Gives you top 5 greatest research papers of all time', inline: false },
             { name: '```trending```', value: 'Gives you top 5 trending research papers', inline: false },
@@ -678,6 +679,17 @@ client.on("messageCreate", async function(message) {
         .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
 
         channel.send({ embeds: [embed] });
+    }
+    else if (command === "aim" || command === "purpose"){
+        const embed = new MessageEmbed()
+        .setColor('#8c52ff')
+        .setTitle('Purpose')
+        .setImage('https://i.imgur.com/4vqmuXq.jpg')
+        .setTimestamp()
+        .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+
+        channel.send({ embeds: [embed] });
+
     }
 
     else{
