@@ -6,6 +6,21 @@ const dotenv = require('dotenv').config()
 const yaml = require('js-yaml');
 const fs   = require('fs');
 const express=require('express');
+const mongoose = require('mongoose');
+const User = require('./models/User');
+
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('MongoDB Connected')
+    mongoose.connection.db.listCollections().toArray(function (err, names) {
+    // console.log(names); // [{ name: 'dbname.myCollection' }]
+
+    });
+
+}).catch(err => console.log(err));
+
 const app=express();
 const bodyParser = require("body-parser")
 const puppeteer = require('puppeteer');
@@ -33,11 +48,12 @@ let domains={
     NLP:"Natural Language Processing",
 }
 
-//Welcome Message
+//Welcome Message ✅
 //Roles by Reaction
 //Slash Commands
-//Wishlist
-//Level Up
+//Wishlist ✅ (Partially)
+//Level Up System
+
 
 const wyd_responses=[
     'Searching for the orphanage you came from so I can send you back.',
@@ -56,7 +72,7 @@ function update_paper_of_the_day(write_object){
     fs.readFile('./paperoftheday.json', (err, data) => {
         if (err) throw err;
         var doc = JSON.parse(data);
-        //if the date is not in the file, add it
+        //if the date is not in the file add it
         if (doc.findIndex(x => x.date === write_object.date) === -1){
             doc.push(write_object);
             fs.writeFile('./paperoftheday.json', JSON.stringify(doc), (err) => {
@@ -72,7 +88,7 @@ function update_paper_of_the_day(write_object){
                 .addFields(
                     { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
                     { name:'Description', value: doc[doc.findIndex(x => x.date === write_object.date)].description, inline: false},
-                    // { name: '\u200B', value: '\u200B' },
+                    ////  { name: '\u200B', value: '\u200B' },
                 )
                 .setTimestamp()
                 .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
@@ -93,7 +109,7 @@ function update_paper_of_the_day(write_object){
             .addFields(
                 { name: 'Title', value: doc[doc.findIndex(x => x.date === write_object.date)].title, inline: false },
                 { name:'Description', value: doc[doc.findIndex(x => x.date === write_object.date)].description, inline: false},
-                // { name: '\u200B', value: '\u200B' },
+                ////  { name: '\u200B', value: '\u200B' },
             )
             .setTimestamp()
             .setURL(doc[doc.findIndex(x => x.date === write_object.date)].link)
@@ -228,8 +244,8 @@ app.get("/blog", function(req,res) {
     .setDescription('Oooh\n Looks like we have a new blog post by '+req.query.name+'!')
     .setThumbnail(req.query.blogImg)
     .addFields(
-        { name: req.query.blogName, value: req.query.blogContent, inline: false },
-        // { name: '\u200B', value: '\u200B' },
+        { name: "**"+req.query.blogName+"**", value: req.query.blogContent, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
     )
     .setTimestamp()
     .setURL(req.query.blogURL)
@@ -281,6 +297,94 @@ client.on("messageCreate", async function(message) {
     }     
     else if (command === "test") {
        channel.send(message.author.username + " has tested the bot!");
+    }
+    else if (command === "save") {
+
+        // message.reply("Here are the papers you have added to your wishlist: " );
+        fs.readFile('./paperoftheday.json', (err, data) => {
+            if (err) throw err;
+            //save the data to doc
+            let wishlist = []
+            doc = JSON.parse(data);
+            data = doc[doc.findIndex(x => x.date === new Date().toLocaleDateString("en-US"))];
+            wishlist.push(data)
+            const new_user = User({id:message.author.id, name:message.author.username, wishlist:wishlist});
+            //check if user exists
+            User.findOne({ id: message.author.id }, (err, user) => {
+                if (err) throw err;
+                if (!user) {
+                console.log("User not found, creating new user");
+                new_user.save(function (err) {
+                    if (err) return handleError(err);
+                    // saved!
+                    console.log('saved!');
+                    message.reply("Saved Paper of the Day!");
+                });
+            }
+
+            else{
+                //check if paper is already in wishlist
+                if(user.wishlist.find(x => x.title === data.title)){
+                    message.reply("You have already saved this paper!");
+                }
+                else{
+
+                user.wishlist.push(data);
+                user.save(function (err) {
+                    if (err) return handleError(err);
+                    // saved!
+                    console.log('saved!');
+                    message.reply("Saved Paper of the Day!");
+                });
+
+                }
+
+            }
+          
+        })
+        
+    
+        //get paper of the day from paperoftheday.json
+        
+       
+
+
+        //get wishlist from database
+        // for (let i = 0; i < wishlist.length; i += 1) {
+        //     message.reply(wishlist[i]);
+        // }
+        //add paper of the day to wishlist
+        
+
+    });
+}
+    else if (command === "saved") {
+        //get wishlist from database
+        User.findOne({ id: message.author.id }, function (err, user) {
+            if (err) return handleError(err);
+            if (user) {
+                message.reply("Here are the papers you have saved: " );
+               //create embed for wishlist
+                var wishlistEmbed = new MessageEmbed()
+                .setColor('#5cf000')
+                .setTitle('Your Saved Papers 📝')
+                // .setDescription('Here are the papers you have saved: ')
+                .setTimestamp()
+                .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
+                for (let i = 0; i < user.wishlist.length; i += 1) {
+                    wishlistEmbed.addFields(
+                        { name: '```'+(i+1)+') '+user.wishlist[i].title+'```', value: user.wishlist[i].description, inline: false },
+                        ////  { name: '\u200B', value: '\u200B' },
+                        {name:"Link", value: user.wishlist[i].link, inline: false}
+                    )
+                }
+                message.channel.send({ embeds: [wishlistEmbed] });
+            }
+            else{
+                message.reply("You have no papers saved!");
+            }
+            // message.channel.send({ embeds: [wishlistEmbed] });
+        })
     }
 
     else if (command === "roles") {
@@ -414,9 +518,9 @@ client.on("messageCreate", async function(message) {
             .setDescription('Upcoming Conferences:'+'\n')
             .setThumbnail(domains[sub][1])
             .addFields(
-                { name: sub_list[0].title+" held from "+sub_list[0].date, value: sub_list[0].link, inline: false },
-                // { name: '\u200B', value: '\u200B' },
-                { name: sub_list[1].title+" held from "+sub_list[1].date, value: sub_list[1].link, inline: false },
+                { name: "```"+ sub_list[0].title+"```"+" held from "+sub_list[0].date, value: sub_list[0].link, inline: false },
+                ////  { name: '\u200B', value: '\u200B' },
+                { name: "```"+ sub_list[1].title+"```"+" held from "+sub_list[1].date, value: sub_list[1].link, inline: false },
             )
            
             //Here there's an error, and i don't know why it occurs, but catching it stops the program from crashing
@@ -432,16 +536,16 @@ client.on("messageCreate", async function(message) {
     .setDescription('These are 5 upcoming conferences')
     .setThumbnail('https://i.imgur.com/eBiE8DT.png')
     .addFields(
-        { name: doc[0].title+" held from "+doc[0].date, value: doc[0].link, inline: false },
-        // { name: '\u200B', value: '\u200B' },
-        { name: doc[1].title+" held from "+doc[1].date, value: doc[1].link, inline: false },
-        // { name: '\u200B', value: '\u200B' },
-        { name: doc[2].title+" held from "+doc[2].date, value: doc[2].link, inline: false },
-        // { name: '\u200B', value: '\u200B' },
-        { name: doc[3].title+" held from "+doc[3].date, value: doc[3].link, inline: false },
-        // { name: '\u200B', value: '\u200B' },
-        { name: doc[4].title+" held from "+doc[4].date, value: doc[4].link, inline: false },
-        // { name: '\u200B', value: '\u200B' },
+        { name: '```'+doc[0].title+'```'+" held from "+doc[0].date, value: doc[0].link, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
+        { name: '```'+doc[1].title+'```'+" held from "+doc[1].date, value: doc[1].link, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
+        { name: '```'+doc[2].title+'```'+" held from "+doc[2].date, value: doc[2].link, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
+        { name: '```'+doc[3].title+'```'+" held from "+doc[3].date, value: doc[3].link, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
+        { name: '```'+doc[4].title+'```'+" held from "+doc[4].date, value: doc[4].link, inline: false },
+        ////  { name: '\u200B', value: '\u200B' },
     )
     .setTimestamp()
     .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
@@ -494,25 +598,25 @@ client.on("messageCreate", async function(message) {
         if (loaded){
             const embed = new MessageEmbed()
             .setColor('#8c52ff')
-            .setTitle('Hot Research on Social Media')
+            .setTitle("**"+'Hot Research on Social Media'+"**")
             .setDescription('These are the top 5 🔥 papers on social media')
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
-                { name: top_5_social_papers[0][0], value: top_5_social_papers[0][2], inline: false },
+                { name: '```'+top_5_social_papers[0][0]+'```', value: top_5_social_papers[0][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[0].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_social_papers[1][0], value: top_5_social_papers[1][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_social_papers[1][0]+'```', value: top_5_social_papers[1][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[1].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_social_papers[2][0], value: top_5_social_papers[2][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_social_papers[2][0]+'```', value: top_5_social_papers[2][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[2].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_social_papers[3][0], value: top_5_social_papers[3][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_social_papers[3][0]+'```', value: top_5_social_papers[3][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[3].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_social_papers[4][0], value: top_5_social_papers[4][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_social_papers[4][0]+'```', value: top_5_social_papers[4][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_social_papers[4].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
+               //  { name: '\u200B', value: '\u200B' },
             )
             .setTimestamp()
             .setFooter({ text: 'Research et Al', iconURL: 'https://i.imgur.com/eBiE8DT.png' });
@@ -530,25 +634,25 @@ client.on("messageCreate", async function(message) {
         if (loaded){
             const embed = new MessageEmbed()
             .setColor('#8c52ff')
-            .setTitle('Latest Research Papers')
+            .setTitle("**"+'Latest Research Papers'+"**")
             .setDescription('These are the top 5 newest papers')
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
-                { name: top_5_latest_papers[0][0], value: top_5_latest_papers[0][2], inline: false },
+                { name: '```'+top_5_latest_papers[0][0]+'```', value: top_5_latest_papers[0][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[0].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_latest_papers[1][0], value: top_5_latest_papers[1][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_latest_papers[1][0]+'```', value: top_5_latest_papers[1][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[1].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_latest_papers[2][0], value: top_5_latest_papers[2][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_latest_papers[2][0]+'```', value: top_5_latest_papers[2][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[2].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_latest_papers[3][0], value: top_5_latest_papers[3][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_latest_papers[3][0]+'```', value: top_5_latest_papers[3][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[3].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_latest_papers[4][0], value: top_5_latest_papers[4][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_latest_papers[4][0]+'```', value: top_5_latest_papers[4][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_latest_papers[4].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
+               //  { name: '\u200B', value: '\u200B' },
 
             )
             .setTimestamp()
@@ -569,25 +673,25 @@ client.on("messageCreate", async function(message) {
         if (loaded){
             const embed = new MessageEmbed()
             .setColor('#8c52ff')
-            .setTitle('Greatest Research Papers')
+            .setTitle("**"+'Greatest Research Papers'+"**")
             .setDescription('These are the top 5 greatest papers 🐐')
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
-                { name: top_5_greatest_papers[0][0], value: top_5_greatest_papers[0][2], inline: false },
+                { name: '```'+top_5_greatest_papers[0][0]+'```', value: top_5_greatest_papers[0][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[0].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_greatest_papers[1][0], value: top_5_greatest_papers[1][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_greatest_papers[1][0]+'```', value: top_5_greatest_papers[1][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[1].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_greatest_papers[2][0], value: top_5_greatest_papers[2][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_greatest_papers[2][0]+'```', value: top_5_greatest_papers[2][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[2].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_greatest_papers[3][0], value: top_5_greatest_papers[3][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_greatest_papers[3][0]+'```', value: top_5_greatest_papers[3][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[3].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_greatest_papers[4][0], value: top_5_greatest_papers[4][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_greatest_papers[4][0]+'```', value: top_5_greatest_papers[4][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_greatest_papers[4].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
+               //  { name: '\u200B', value: '\u200B' },
 
             )
             .setTimestamp()
@@ -607,25 +711,25 @@ client.on("messageCreate", async function(message) {
         if (loaded){
             const embed = new MessageEmbed()
             .setColor('#8c52ff')
-            .setTitle('Trending Research Papers')
+            .setTitle("**"+'Trending Research Papers'+"**")
             .setDescription('These are the top 5 trending papers')
             .setThumbnail('https://i.imgur.com/eBiE8DT.png')
             .addFields(
-                { name: top_5_trending_papers[0][0], value: top_5_trending_papers[0][2], inline: false },
+                { name: '```'+top_5_trending_papers[0][0]+'```', value: top_5_trending_papers[0][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[0].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_trending_papers[1][0], value: top_5_trending_papers[1][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_trending_papers[1][0]+'```', value: top_5_trending_papers[1][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[1].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_trending_papers[2][0], value: top_5_trending_papers[2][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_trending_papers[2][0]+'```', value: top_5_trending_papers[2][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[2].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_trending_papers[3][0], value: top_5_trending_papers[3][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_trending_papers[3][0]+'```', value: top_5_trending_papers[3][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[3].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
-                { name: top_5_trending_papers[4][0], value: top_5_trending_papers[4][2], inline: false },
+               //  { name: '\u200B', value: '\u200B' },
+                { name: '```'+top_5_trending_papers[4][0]+'```', value: top_5_trending_papers[4][2], inline: false },
                 {name:"Link",value:"[Click Here to go to the website]("+top_5_trending_papers[4].at(-1)+")", inline:false},
-                { name: '\u200B', value: '\u200B' },
+               //  { name: '\u200B', value: '\u200B' },
 
             )
             .setTimestamp()
@@ -655,24 +759,35 @@ client.on("messageCreate", async function(message) {
     else if (command === "help"){
         const embed = new MessageEmbed()
         .setColor('#8c52ff')
-        .setTitle('Help')
+        .setTitle("**"+'Help'+"**")
         .setDescription('These are the commands you can use')
         .setThumbnail('https://i.imgur.com/HSUAWtg.png')
         .addFields(
-            { name: '```aim or purpose ```', value: 'Wondering what we do at Research et Al?\n Find out here', inline: false },
-            { name: '```new or latest``` ', value: 'Gives you top 5 latest research papers', inline: false },
-            { name: '```greatest or goat or 🐐```', value: 'Gives you top 5 greatest research papers of all time', inline: false },
-            { name: '```trending```', value: 'Gives you top 5 trending research papers', inline: false },
-            { name: '```hot or 🔥```', value: 'Gives you top 5 hot research papers on social media', inline: false },
-            { name: '```wyd or sup or wassup```', value: 'Tells you what I\'m doing', inline: false },
-            { name: '```help```', value: 'Gives you this message', inline: false },
-            { name: '```potd```', value: 'Gives you the paper of the day', inline: false },
-            { name: '```roles```', value: 'Choose a role', inline: false },
+            { name: '\u200B', value: '\u200B' },
+            { name: "**"+'Research Papers'+"**", value: 'Commands related to research papers', inline: false },
+            { name: '```new or latest``` ', value: 'See the top 5 latest research papers', inline: false },
+            { name: '```trending```', value: 'See the top 5 trending research papers', inline: false },
+            { name: '```hot or 🔥```', value: 'See the top 5 hot research papers on social media', inline: false },
+            { name: '```greatest or goat or 🐐```', value: 'See the top 5 greatest research papers of all time', inline: false },
+            { name: '```potd```', value: 'See the Paper of the Day', inline: false },
+            { name: '```save```', value: 'Save the Paper of the Day to read later', inline: false },
+            { name: '```saved```', value: 'See all saved papers', inline: false },
+            { name: '\u200B', value: '\u200B' },
+            { name: "**"+'Conferences'+"**", value: 'Commands related to conferences', inline: false },
             { name: '```domains```', value: 'See two upcoming conferences for a domain', inline: false },
             { name: '```conferences```', value: 'See five upcoming conferences', inline: false },
+            { name: '\u200B', value: '\u200B' },
+            { name: "**"+'Social Media'+"**", value: 'Social media details', inline: false },
             { name: '```linkedin```', value: 'Get the LinkedIn profile of Research et Al', inline: false },
             { name: '```github```', value: 'Get the GitHub profile of Research et Al', inline: false },
             { name: '```instagram```', value: 'Get the Instagram profile of Research et Al', inline: false },
+            { name: '\u200B', value: '\u200B' },
+            { name: "**"+'Other'+"**", value: 'Other commands', inline: false },
+            { name: '```roles```', value: 'Choose a role', inline: false },
+            { name: '```aim or purpose ```', value: 'Wondering what we do at Research et Al?\n Find out here', inline: false },
+            { name: '```wyd or sup or wassup```', value: 'Tells you what I\'m doing', inline: false },
+            { name: '```help```', value: 'Gives you this message', inline: false },
+
 
         )
         .setTimestamp()

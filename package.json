@@ -26,6 +26,7 @@
     "express": "^4.17.2",
     "fs": "^0.0.1-security",
     "js-yaml": "^4.1.0",
+    "mongoose": "^6.2.1",
     "puppeteer": "^13.1.3"
   }
 }
