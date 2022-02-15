@@ -40,5 +40,11 @@
     "link": "https://paperswithcode.com/paper/source-code-summarization-with-structural",
     "description": "We further show that how the proposed SCRIPT captures the structural relative dependencies.",
     "date": "2/15/2022"
+  },
+  {
+    "title": "A Pragmatic Machine Learning Approach to Quantify Tumor Infiltrating Lymphocytes in Whole Slide Images",
+    "link": "https://paperswithcode.com/paper/a-pragmatic-machine-learning-approach-to",
+    "description": "Our approach is to transfer an open source machine learning method for segmentation and classification of nuclei in H&E slides trained on public data to TIL quantification without manual labeling of our data.",
+    "date": "2/16/2022"
   }
 ]
