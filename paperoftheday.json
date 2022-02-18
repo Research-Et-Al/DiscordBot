@@ -52,5 +52,11 @@
     "link": "https://paperswithcode.com/paper/one-configuration-to-rule-them-all-towards",
     "description": "Topic models are statistical methods that extract underlying topics from document collections.",
     "date": "2/17/2022"
+  },
+  {
+    "title": "cosFormer: Rethinking Softmax in Attention",
+    "link": "https://paperswithcode.com/paper/cosformer-rethinking-softmax-in-attention-1",
+    "description": "As one of its core components, the softmax attention helps to capture long-range dependencies yet prohibits its scale-up due to the quadratic space and time complexity to the sequence length.",
+    "date": "2/18/2022"
   }
 ]
