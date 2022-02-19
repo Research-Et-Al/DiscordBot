@@ -355,6 +355,34 @@ client.on("messageCreate", async function (message) {
   if (command === "ping") {
     const timeTaken = Date.now() - message.createdTimestamp;
     message.reply(`Hello! This message had a latency of ${timeTaken}ms.`);
+  } else if (command === "upcoming") {
+    //create embed for upcoming events
+    const upcomingEmbed = new MessageEmbed()
+      .setColor(colors[Math.floor(Math.random() * colors.length)])
+      .setTitle("Upcoming Events")
+      .setDescription("Here are the upcoming events!")
+      .addFields({
+        name: "**" + "έρευνα (Erevna)" + "**",
+        value:
+          "Want to publish a scientific paper but don't know where to start? Don't worry, we have got you covered!\nPresenting to you, έρευνα (Erevna), a 3 week-long event to familiarize students with the proceedings of academic conferences and help them master the art of scientific writing! ✍️",
+        inline: false,
+      },
+      {
+        name: "**" + "Registration Link" + "**",
+        value: "https://forms.gle/DE3oDQ7BTTknBHwD7",
+        inline: false,
+      }
+      )
+      .setImage(
+        "https://cdn.discordapp.com/attachments/904777742145437746/944529799488090122/WhatsApp_Image_2022-02-19_at_1.23.14_PM.jpeg"
+      )
+      .setTimestamp()
+      .setFooter({
+        text: "Research et Al",
+        iconURL: "https://i.imgur.com/eBiE8DT.png",
+      });
+
+    channel.send({ embeds: [upcomingEmbed] });
   } else if (command === "wyd" || command === "wassup" || command === "sup") {
     // console.log(message.author.id);
     // random element from wyd_responses
