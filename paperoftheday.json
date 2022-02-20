@@ -64,5 +64,11 @@
     "link": "https://paperswithcode.com/paper/a-study-of-deep-perceptual-metrics-for-image",
     "description": "Several metrics exist to quantify the similarity between images, but they are inefficient when it comes to measure the similarity of highly distorted images.",
     "date": "2/19/2022"
+  },
+  {
+    "title": "Hamilton-Jacobi equations on graphs with applications to semi-supervised learning and data depth",
+    "link": "https://paperswithcode.com/paper/hamilton-jacobi-equations-on-graphs-with",
+    "description": "We show that the $p$-eikonal equation with $p=1$ is a provably robust distance-type function on a graph, and the $p\\to \\infty$ limit recovers shortest path distances.",
+    "date": "2/20/2022"
   }
 ]
