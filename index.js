@@ -1273,6 +1273,7 @@ client.on("messageCreate", async function (message) {
         },
         { name: "\u200B", value: "\u200B" },
         { name: "**" + "Other" + "**", value: "Other commands", inline: false },
+        { name : "```upcoming```", value: "See Upcoming Events!", inline: false },
         { name: "```roles```", value: "Choose a role", inline: false },
         {
           name: "```aim or purpose ```",
