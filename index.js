@@ -338,6 +338,11 @@ client.on("guildMemberAdd", async (member) => {
     .send({ embeds: [welcomeEmbed] });
 });
 
+client.on("ready",()=>{
+client.user.setActivity("you learn about research related matters", { type: "WATCHING" });
+console.log("Bot is ready");
+})
+
 client.on("messageCreate", async function (message) {
   if (message.author.bot) return;
   var msgtok = message.content.toLowerCase().split(" "); //Tokenize the message
@@ -1312,6 +1317,8 @@ client.on("messageCreate", async function (message) {
 });
 
 client.login(process.env.BOT_TOKEN);
+
+
 
 app.listen(process.env.PORT, function () {
   console.log("The Server is running on port 3000");
