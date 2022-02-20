@@ -1321,5 +1321,5 @@ client.login(process.env.BOT_TOKEN);
 
 
 app.listen(process.env.PORT, function () {
-  console.log("The Server is running on port 3000");
+  console.log("The Server is running on port " + process.env.PORT);
 });
