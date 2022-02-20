@@ -70,5 +70,11 @@
     "link": "https://paperswithcode.com/paper/hamilton-jacobi-equations-on-graphs-with",
     "description": "We show that the $p$-eikonal equation with $p=1$ is a provably robust distance-type function on a graph, and the $p\\to \\infty$ limit recovers shortest path distances.",
     "date": "2/20/2022"
+  },
+  {
+    "title": "TAFNet: A Three-Stream Adaptive Fusion Network for RGB-T Crowd Counting",
+    "link": "https://paperswithcode.com/paper/tafnet-a-three-stream-adaptive-fusion-network",
+    "description": "Specifically, TAFNet is divided into one main stream and two auxiliary streams.",
+    "date": "2/21/2022"
   }
 ]

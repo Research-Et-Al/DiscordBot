@@ -389,7 +389,7 @@ client.on("messageCreate", async function (message) {
 
     channel.send({ embeds: [upcomingEmbed] });
   } else if (command === "wyd" || command === "wassup" || command === "sup") {
-    // console.log(message.author.id);
+    console.log(message.channel.id);
     // random element from wyd_responses
     message.reply(wyd_responses[(wyd_responses.length * Math.random()) | 0]);
   } else if (command === "test") {
