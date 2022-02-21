@@ -280,14 +280,14 @@ doc = doc.filter(function (conference) {
     Date.parse(conference.deadline) > Date.now() && conference.year >= 2022
   );
 });
-app.get("/", function () {
-  const channel = client.channels.cache.find(
-    (channel) => channel.id === process.env.CHANNEL_ID
-  );
-  channel.send(
-    "This is an automated message sent from port " + process.env.PORT
-  );
-});
+// app.get("/", function () {
+//   const channel = client.channels.cache.find(
+//     (channel) => channel.id === process.env.CHANNEL_ID
+//   );
+//   channel.send(
+//     "This is an automated message sent from port " + process.env.PORT
+//   );
+// });
 
 //Send a message to the channel if there's a new post
 app.get("/blog", function (req, res) {
@@ -478,7 +478,8 @@ client.on("messageCreate", async function (message) {
         }
         message.channel.send({ embeds: [wishlistEmbed] });
       } else {
-        message.reply("You have no papers saved!");
+        message.reply("You have no papers saved!\n Use `ylc save` to save a paper!");
+
       }
       // message.channel.send({ embeds: [wishlistEmbed] });
     });
