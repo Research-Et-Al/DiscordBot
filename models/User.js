@@ -4,6 +4,8 @@ const schema = new mongoose.Schema({
   id: "string",
   wishlist: "array",
   blogs: "array",
+  // xp : "number",
+  // level : "number",
 });
 const User = mongoose.model("User", schema);
 module.exports = User;

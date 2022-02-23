@@ -64,6 +64,8 @@ let domains = {
 //Wishlist ✅ (Partially)
 //Level Up System
 
+
+
 const wyd_responses = [
   "Searching for the orphanage you came from so I can send you back.",
   "Meditating. Be quiet",
@@ -76,6 +78,59 @@ const wyd_responses = [
   "Inventing time travel. I'll let you know how it works out last week.",
 ];
 
+// function add_xp(message, xp) {
+//   User.findOne({
+//     id: message.author.id,
+//   }).then((user
+//     ) => {
+//     if (user) {
+//       user.xp += xp;
+//       user.save().then((user) => {
+//         console.log(`${user.name} has gained ${xp} xp`);
+//         if (user.xp >= user.level * 10) {
+//           user.level += 1;
+//           user.xp = 0;
+//           user.save().then((user) => {
+//             console.log(`${user.name} has leveled up to level ${user.level}`);
+//             //Send a message to the user
+//             message.channel.send(
+//               `${user.name} has leveled up to level ${user.level}`
+//             );
+//           });
+//         }
+//       });
+//     }
+//     else{
+//       new_user = new User({
+//         id: message.author.id,
+//         name: message.author.username,
+//         xp: xp,
+//         level: 1,
+//         wishlist: [],
+//         blogs: [],
+//       });
+
+//       new_user.save().then((user) => {
+//         console.log(`${user.name} has gained ${xp} xp`);
+//         if (user.xp >= user.level * 10) {
+//           user.level += 1;
+//           user.xp = 0;
+//           user.save().then((user) => {
+//             console.log(`${user.name} has leveled up to level ${user.level}`);
+//             //Send a message to the user
+//             message.channel.send(
+//               `${user.name} has leveled up to level ${user.level}`
+//             );
+//           });
+//         }
+
+//       });
+
+      
+
+//     }
+//   });
+// }
 //Update Paper of the Day if it isn't updated in the JSON file
 function update_paper_of_the_day(write_object) {
   fs.readFile("./paperoftheday.json", (err, data) => {
@@ -159,6 +214,7 @@ function update_paper_of_the_day(write_object) {
     }
   });
 }
+
 
 //Function to get all the data from paperswithcode.com
 function scrape_data(query) {
@@ -392,6 +448,7 @@ client.on("messageCreate", async function (message) {
     console.log(message.channel.id);
     // random element from wyd_responses
     message.reply(wyd_responses[(wyd_responses.length * Math.random()) | 0]);
+    // add_xp(message, 1);
   } else if (command === "test") {
     channel.send(message.author.username + " has tested the bot!");
   } else if (command === "save") {
@@ -413,6 +470,8 @@ client.on("messageCreate", async function (message) {
         name: message.author.username,
         wishlist: wishlist,
         blogs: [],
+        // xp: 0,
+        // level : 1,
       });
       //check if user exists
       User.findOne({ id: message.author.id }, (err, user) => {
