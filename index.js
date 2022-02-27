@@ -132,7 +132,9 @@ const wyd_responses = [
 //   });
 // }
 //Update Paper of the Day if it isn't updated in the JSON file
-function update_paper_of_the_day(write_object) {
+function update_paper_of_the_day(write_object, channel_id) {
+  console.log(channel_id)
+  const channel = client.channels.cache.get(channel_id);
   fs.readFile("./paperoftheday.json", (err, data) => {
     if (err) throw err;
     var doc = JSON.parse(data);
@@ -142,9 +144,6 @@ function update_paper_of_the_day(write_object) {
       fs.writeFile("./paperoftheday.json", JSON.stringify(doc), (err) => {
         if (err) throw err;
         console.log("Paper of the day updated!");
-        const channel = client.channels.cache.find(
-          (channel) => channel.id === process.env.CHANNEL_ID
-        );
         const potdEmbed = new MessageEmbed()
           //set color to random from colors array
           .setColor(colors[Math.floor(Math.random() * colors.length)])
@@ -181,7 +180,7 @@ function update_paper_of_the_day(write_object) {
       console.log("Date already in file!");
       //create embed for the paper of the day
       const channel = client.channels.cache.find(
-        (channel) => channel.id === process.env.CHANNEL_ID
+        (channel) => channel.id === channel_id
       );
       const potdEmbed = new MessageEmbed()
         .setColor(colors[Math.floor(Math.random() * colors.length)])
@@ -411,7 +410,7 @@ client.on("messageCreate", async function (message) {
   // const args = commandBody.split(' ');
   // const command = args.shift().toLowerCase();
   const channel = client.channels.cache.find(
-    (channel) => channel.id === process.env.CHANNEL_ID
+    (channel) => channel.id === message.channel.id
   );
   if (command === "ping") {
     const timeTaken = Date.now() - message.createdTimestamp;
@@ -1249,7 +1248,7 @@ client.on("messageCreate", async function (message) {
       date: new Date().toLocaleDateString("en-US"),
     };
 
-    update_paper_of_the_day(write_object);
+    update_paper_of_the_day(write_object,message.channel.id);
   } else if (command === "help") {
     const embed = new MessageEmbed()
       .setColor("#8c52ff")
