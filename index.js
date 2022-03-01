@@ -442,6 +442,38 @@ client.on("messageCreate", async function (message) {
       });
 
     channel.send({ embeds: [upcomingEmbed] });
+  } else if (command === "excuse") {
+    excuse = fetch("https://excuser.herokuapp.com/v1/excuse").then((res) =>
+      res.json()
+    );
+    excuse.then((data) => {
+      data = data[0];
+
+      const excuseEmbed = new MessageEmbed()
+        .setColor(colors[Math.floor(Math.random() * colors.length)])
+        .setTitle("Excuse Generator")
+        .setThumbnail(
+          "https://styles.redditmedia.com/t5_26eosz/styles/profileIcon_8847im20pb081.jpg"
+        )
+        .addFields({
+          name:
+            "**" +
+            data.category.charAt(0).toUpperCase() +
+            data.category.slice(1) +
+            " Excuse" +
+            "**",
+          value: data.excuse,
+          inline: false,
+        })
+
+        .setTimestamp()
+        .setFooter({
+          text: "Research et Al",
+          iconURL: "https://i.imgur.com/eBiE8DT.png",
+        });
+
+      channel.send({ embeds: [excuseEmbed] });
+    });
   } else if (command === "kanye") {
     quote = fetch("https://api.kanye.rest/").then((res) => res.json());
     quote.then((data) => {
@@ -1391,6 +1423,11 @@ client.on("messageCreate", async function (message) {
           name: "```fact```",
           value: "Gives you a fact",
           inline: false,
+        },
+        {
+name: "```excuse```",
+value: "Gives you an excuse to use ;)",
+inline: false,
         },
         {
           name: "```upcoming```",
