@@ -65,8 +65,6 @@ let domains = {
 //Wishlist ✅ (Partially)
 //Level Up System
 
-
-
 const wyd_responses = [
   "Searching for the orphanage you came from so I can send you back.",
   "Meditating. Be quiet",
@@ -127,14 +125,12 @@ const wyd_responses = [
 
 //       });
 
-      
-
 //     }
 //   });
 // }
 //Update Paper of the Day if it isn't updated in the JSON file
 function update_paper_of_the_day(write_object, channel_id) {
-  console.log(channel_id)
+  console.log(channel_id);
   const channel = client.channels.cache.get(channel_id);
   fs.readFile("./paperoftheday.json", (err, data) => {
     if (err) throw err;
@@ -214,7 +210,6 @@ function update_paper_of_the_day(write_object, channel_id) {
     }
   });
 }
-
 
 //Function to get all the data from paperswithcode.com
 function scrape_data(query) {
@@ -394,10 +389,12 @@ client.on("guildMemberAdd", async (member) => {
     .send({ embeds: [welcomeEmbed] });
 });
 
-client.on("ready",()=>{
-client.user.setActivity("you learn about research related matters", { type: "WATCHING" });
-console.log("Bot is ready");
-})
+client.on("ready", () => {
+  client.user.setActivity("you learn about research related matters", {
+    type: "WATCHING",
+  });
+  console.log("Bot is ready");
+});
 
 client.on("messageCreate", async function (message) {
   if (message.author.bot) return;
@@ -422,17 +419,18 @@ client.on("messageCreate", async function (message) {
       .setColor(colors[Math.floor(Math.random() * colors.length)])
       .setTitle("Upcoming Events")
       .setDescription("Here are the upcoming events!")
-      .addFields({
-        name: "**" + "έρευνα (Erevna)" + "**",
-        value:
-          "Want to publish a scientific paper but don't know where to start? Don't worry, we have got you covered!\nPresenting to you, έρευνα (Erevna), a 3 week-long event to familiarize students with the proceedings of academic conferences and help them master the art of scientific writing! ✍️",
-        inline: false,
-      },
-      {
-        name: "**" + "Registration Link" + "**",
-        value: "https://forms.gle/DE3oDQ7BTTknBHwD7",
-        inline: false,
-      }
+      .addFields(
+        {
+          name: "**" + "έρευνα (Erevna)" + "**",
+          value:
+            "Want to publish a scientific paper but don't know where to start? Don't worry, we have got you covered!\nPresenting to you, έρευνα (Erevna), a 3 week-long event to familiarize students with the proceedings of academic conferences and help them master the art of scientific writing! ✍️",
+          inline: false,
+        },
+        {
+          name: "**" + "Registration Link" + "**",
+          value: "https://forms.gle/DE3oDQ7BTTknBHwD7",
+          inline: false,
+        }
       )
       .setImage(
         "https://cdn.discordapp.com/attachments/904777742145437746/944529799488090122/WhatsApp_Image_2022-02-19_at_1.23.14_PM.jpeg"
@@ -444,15 +442,16 @@ client.on("messageCreate", async function (message) {
       });
 
     channel.send({ embeds: [upcomingEmbed] });
-  }else if (command === "kanye") {
+  } else if (command === "kanye") {
     quote = fetch("https://api.kanye.rest/").then((res) => res.json());
     quote.then((data) => {
-      
       kanyeEmbed = new MessageEmbed()
         .setColor(colors[Math.floor(Math.random() * colors.length)])
         .setTitle("Kanye Quote")
         .setDescription("Here is your Kanye West quote!")
-        .setThumbnail("https://media.vanityfair.com/photos/62093321237a9fc52a53a0d4/3:4/w_2460,h_3280,c_limit/1366417675")
+        .setThumbnail(
+          "https://media.vanityfair.com/photos/62093321237a9fc52a53a0d4/3:4/w_2460,h_3280,c_limit/1366417675"
+        )
         .addFields({
           name: "\u200B",
           value: "**" + data.quote + "**",
@@ -465,9 +464,30 @@ client.on("messageCreate", async function (message) {
         });
       channel.send({ embeds: [kanyeEmbed] });
     });
-  }
-  
-  else if (command === "wyd" || command === "wassup" || command === "sup") {
+  } else if (command === "fact") {
+    fact = fetch("https://uselessfacts.jsph.pl/random.json?language=en").then(
+      (res) => res.json()
+    );
+    fact.then((data) => {
+      factEmbed = new MessageEmbed();
+      factEmbed.setColor(colors[Math.floor(Math.random() * colors.length)]);
+      factEmbed.setTitle("Fact");
+      factEmbed.setThumbnail(
+        "https://www.changefactory.com.au/wp-content/uploads/2010/09/article-fact-or-opinion.jpg"
+      );
+      factEmbed.addFields({
+        name: "Did you know?",
+        value: "**" + data.text + "**",
+        inline: false,
+      });
+      factEmbed.setTimestamp();
+      factEmbed.setFooter({
+        text: "Research et Al",
+        iconURL: "https://i.imgur.com/eBiE8DT.png",
+      });
+      channel.send({ embeds: [factEmbed] });
+    });
+  } else if (command === "wyd" || command === "wassup" || command === "sup") {
     console.log(message.channel.id);
     // random element from wyd_responses
     message.reply(wyd_responses[(wyd_responses.length * Math.random()) | 0]);
@@ -560,8 +580,9 @@ client.on("messageCreate", async function (message) {
         }
         message.channel.send({ embeds: [wishlistEmbed] });
       } else {
-        message.reply("You have no papers saved!\n Use `ylc save` to save a paper!");
-
+        message.reply(
+          "You have no papers saved!\n Use `ylc save` to save a paper!"
+        );
       }
       // message.channel.send({ embeds: [wishlistEmbed] });
     });
@@ -1272,7 +1293,7 @@ client.on("messageCreate", async function (message) {
       date: new Date().toLocaleDateString("en-US"),
     };
 
-    update_paper_of_the_day(write_object,message.channel.id);
+    update_paper_of_the_day(write_object, message.channel.id);
   } else if (command === "help") {
     const embed = new MessageEmbed()
       .setColor("#8c52ff")
@@ -1366,7 +1387,16 @@ client.on("messageCreate", async function (message) {
           value: "Gives you a Kanye West quote",
           inline: false,
         },
-        { name : "```upcoming```", value: "See Upcoming Events!", inline: false },
+        {
+          name: "```fact```",
+          value: "Gives you a fact",
+          inline: false,
+        },
+        {
+          name: "```upcoming```",
+          value: "See Upcoming Events!",
+          inline: false,
+        },
         { name: "```roles```", value: "Choose a role", inline: false },
         {
           name: "```aim or purpose ```",
@@ -1405,8 +1435,6 @@ client.on("messageCreate", async function (message) {
 });
 
 client.login(process.env.BOT_TOKEN);
-
-
 
 app.listen(process.env.PORT, function () {
   console.log("The Server is running on port " + process.env.PORT);
