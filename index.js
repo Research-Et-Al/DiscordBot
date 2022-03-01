@@ -3,6 +3,7 @@ const client = new Discord.Client({
   intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS"],
 });
 const { MessageEmbed } = require("discord.js");
+const fetch = require("node-fetch");
 const prefix = "ylc";
 const dotenv = require("dotenv").config();
 const yaml = require("js-yaml");
@@ -443,7 +444,30 @@ client.on("messageCreate", async function (message) {
       });
 
     channel.send({ embeds: [upcomingEmbed] });
-  } else if (command === "wyd" || command === "wassup" || command === "sup") {
+  }else if (command === "kanye") {
+    quote = fetch("https://api.kanye.rest/").then((res) => res.json());
+    quote.then((data) => {
+      
+      kanyeEmbed = new MessageEmbed()
+        .setColor(colors[Math.floor(Math.random() * colors.length)])
+        .setTitle("Kanye Quote")
+        .setDescription("Here is your Kanye West quote!")
+        .setThumbnail("https://media.vanityfair.com/photos/62093321237a9fc52a53a0d4/3:4/w_2460,h_3280,c_limit/1366417675")
+        .addFields({
+          name: "\u200B",
+          value: "**" + data.quote + "**",
+          inline: false,
+        })
+        .setTimestamp()
+        .setFooter({
+          text: "Research et Al",
+          iconURL: "https://i.imgur.com/eBiE8DT.png",
+        });
+      channel.send({ embeds: [kanyeEmbed] });
+    });
+  }
+  
+  else if (command === "wyd" || command === "wassup" || command === "sup") {
     console.log(message.channel.id);
     // random element from wyd_responses
     message.reply(wyd_responses[(wyd_responses.length * Math.random()) | 0]);
@@ -1256,7 +1280,7 @@ client.on("messageCreate", async function (message) {
       .setDescription("These are the commands you can use")
       .setThumbnail("https://i.imgur.com/HSUAWtg.png")
       .addFields(
-        { name: "\u200B", value: "\u200B" },
+        // { name: "\u200B", value: "\u200B" },
         {
           name: "**" + "Research Papers" + "**",
           value: "Commands related to research papers",
@@ -1298,7 +1322,7 @@ client.on("messageCreate", async function (message) {
           value: "Remove the saved paper at the given number",
           inline: false,
         },
-        { name: "\u200B", value: "\u200B" },
+        // { name: "\u200B", value: "\u200B" },
         {
           name: "**" + "Conferences" + "**",
           value: "Commands related to conferences",
@@ -1314,7 +1338,7 @@ client.on("messageCreate", async function (message) {
           value: "See five upcoming conferences",
           inline: false,
         },
-        { name: "\u200B", value: "\u200B" },
+        // { name: "\u200B", value: "\u200B" },
         {
           name: "**" + "Social Media" + "**",
           value: "Social media details",
@@ -1335,8 +1359,13 @@ client.on("messageCreate", async function (message) {
           value: "Get the Instagram profile of Research et Al",
           inline: false,
         },
-        { name: "\u200B", value: "\u200B" },
+        // { name: "\u200B", value: "\u200B" },
         { name: "**" + "Other" + "**", value: "Other commands", inline: false },
+        {
+          name: "```kanye```",
+          value: "Gives you a Kanye West quote",
+          inline: false,
+        },
         { name : "```upcoming```", value: "See Upcoming Events!", inline: false },
         { name: "```roles```", value: "Choose a role", inline: false },
         {
