@@ -448,7 +448,7 @@ client.on("messageCreate", async function (message) {
       kanyeEmbed = new MessageEmbed()
         .setColor(colors[Math.floor(Math.random() * colors.length)])
         .setTitle("Kanye Quote")
-        .setDescription("Here is your Kanye West quote!")
+        // .setDescription("Here is your Kanye West quote!")
         .setThumbnail(
           "https://media.vanityfair.com/photos/62093321237a9fc52a53a0d4/3:4/w_2460,h_3280,c_limit/1366417675"
         )
