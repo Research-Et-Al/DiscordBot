@@ -1425,9 +1425,9 @@ client.on("messageCreate", async function (message) {
           inline: false,
         },
         {
-name: "```excuse```",
-value: "Gives you an excuse to use ;)",
-inline: false,
+          name: "```excuse```",
+          value: "Gives you an excuse to use ;)",
+          inline: false,
         },
         {
           name: "```upcoming```",
