@@ -331,7 +331,7 @@ conference_doc = conference_doc.filter(function (conference) {
     Date.parse(conference.deadline) > Date.now() && conference.year >= 2022
   );
 });
-console.log(conference_doc);
+// console.log(conference_doc);
 // app.get("/", function () {
 //   const channel = client.channels.cache.find(
 //     (channel) => channel.id === process.env.CHANNEL_ID
@@ -817,6 +817,8 @@ client.on("messageCreate", async function (message) {
       const sub_list = conference_doc.filter(function (conference) {
         return conference.sub === sub;
       });
+      console.log(sub)
+      console.log(sub_list)
       conference_embed = new MessageEmbed()
         .setColor(colors[Math.floor(Math.random() * colors.length)])
         .setTitle(domains[sub][0])
@@ -834,16 +836,16 @@ client.on("messageCreate", async function (message) {
             inline: false,
           },
           ////  { name: '\u200B', value: '\u200B' },
-          {
-            name:
-              "```" +
-              sub_list[1].title +
-              "```" +
-              " held from " +
-              sub_list[1].date,
-            value: sub_list[1].link,
-            inline: false,
-          }
+          // {
+          //   name:
+          //     "```" +
+          //     sub_list[1].title +
+          //     "```" +
+          //     " held from " +
+          //     sub_list[1].date,
+          //   value: sub_list[1].link,
+          //   inline: false,
+          // }
         );
 
       //Here there's an error, and i don't know why it occurs, but catching it stops the program from crashing
@@ -1385,7 +1387,7 @@ client.on("messageCreate", async function (message) {
         },
         {
           name: "```domains```",
-          value: "See two upcoming conferences for a domain",
+          value: "See an upcoming conference for a domain",
           inline: false,
         },
         {
