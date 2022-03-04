@@ -324,13 +324,14 @@ app.use(
   })
 );
 //Conferences from the website repository
-let doc = yaml.load(fs.readFileSync("./conferences.yml", "utf8"));
-doc.sort((a, b) => Date.parse(a.deadline) - Date.parse(b.deadline));
-doc = doc.filter(function (conference) {
+let conference_doc = yaml.load(fs.readFileSync("./conferences.yml", "utf8"));
+conference_doc.sort((a, b) => Date.parse(a.deadline) - Date.parse(b.deadline));
+conference_doc = conference_doc.filter(function (conference) {
   return (
     Date.parse(conference.deadline) > Date.now() && conference.year >= 2022
   );
 });
+console.log(conference_doc);
 // app.get("/", function () {
 //   const channel = client.channels.cache.find(
 //     (channel) => channel.id === process.env.CHANNEL_ID
@@ -813,7 +814,7 @@ client.on("messageCreate", async function (message) {
       // console.log(interaction)
       //get elements from doc if sub is equal to interaction.values[0]
       const sub = interaction.values[0];
-      const sub_list = doc.filter(function (conference) {
+      const sub_list = conference_doc.filter(function (conference) {
         return conference.sub === sub;
       });
       conference_embed = new MessageEmbed()
@@ -857,6 +858,7 @@ client.on("messageCreate", async function (message) {
         .catch(console.error);
     });
   } else if (command === "conferences") {
+    console.log(conference_doc);
     // inside a command, event listener, etc.
     const embed = new MessageEmbed()
       .setColor("#8c52ff")
@@ -865,32 +867,32 @@ client.on("messageCreate", async function (message) {
       .setThumbnail("https://i.imgur.com/eBiE8DT.png")
       .addFields(
         {
-          name: "```" + doc[0].title + "```" + " held from " + doc[0].date,
-          value: doc[0].link,
+          name: "```" + conference_doc[0].title + "```" + " held from " + conference_doc[0].date,
+          value: conference_doc[0].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + doc[1].title + "```" + " held from " + doc[1].date,
-          value: doc[1].link,
+          name: "```" + conference_doc[1].title + "```" + " held from " + conference_doc[1].date,
+          value: conference_doc[1].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + doc[2].title + "```" + " held from " + doc[2].date,
-          value: doc[2].link,
+          name: "```" + conference_doc[2].title + "```" + " held from " + conference_doc[2].date,
+          value: conference_doc[2].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + doc[3].title + "```" + " held from " + doc[3].date,
-          value: doc[3].link,
+          name: "```" + conference_doc[3].title + "```" + " held from " + conference_doc[3].date,
+          value: conference_doc[3].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + doc[4].title + "```" + " held from " + doc[4].date,
-          value: doc[4].link,
+          name: "```" + conference_doc[4].title + "```" + " held from " + conference_doc[4].date,
+          value: conference_doc[4].link,
           inline: false,
         }
         ////  { name: '\u200B', value: '\u200B' },
