@@ -14,7 +14,7 @@
   {
     "title": "Semi-Supervised Convolutive NMF for Automatic Music Transcription",
     "link": "https://paperswithcode.com/paper/semi-supervised-convolutive-nmf-for-automatic",
-    "description": "Automatic Music Transcription, which consists in transforming an audio recording of a musical performance into symbolic format, remains a difficult Music Information Retrieval task.",
+    "description": "Automatic Music Transcription, which consists in transforming an audio recording of a musical performance into symbolic foßrmat, remains a difficult Music Information Retrieval task.",
     "date": "2/11/2022"
   },
   {
@@ -196,5 +196,11 @@
     "link": "https://paperswithcode.com/paper/a-low-rank-ensemble-kalman-filter-for",
     "description": "We propose a regularization method for ensemble Kalman filtering (EnKF) with elliptic observation operators.",
     "date": "3/13/2022"
+  },
+  {
+    "title": "Multi-modal Graph Learning for Disease Prediction",
+    "link": "https://paperswithcode.com/paper/multi-modal-graph-learning-for-disease-1",
+    "description": "For disease prediction tasks, most existing graph-based methods tend to define the graph manually based on specified modality (e. g., demographic information), and then integrated other modalities to obtain the patient representation by Graph Representation Learning (GRL).",
+    "date": "3/14/2022"
   }
 ]
