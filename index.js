@@ -585,6 +585,8 @@ client.on("messageCreate", async function (message) {
       //add paper of the day to wishlist
     });
   } else if (command === "saved") {
+    index = parseInt(msgtok[2]) - 1;
+
     //get wishlist from database
     User.findOne({ id: message.author.id }, function (err, user) {
       if (err) return handleError(err);
@@ -600,18 +602,23 @@ client.on("messageCreate", async function (message) {
             text: "Research et Al",
             iconURL: "https://i.imgur.com/eBiE8DT.png",
           });
-        for (let i = 0; i < user.wishlist.length; i += 1) {
-          wishlistEmbed.addFields(
-            {
-              name: "```" + (i + 1) + ") " + user.wishlist[i].title + "```",
-              value: user.wishlist[i].description,
-              inline: false,
-            },
-            ////  { name: '\u200B', value: '\u200B' },
-            { name: "Link", value: user.wishlist[i].link, inline: false }
-          );
+        let wishlist = user.wishlist.slice(5 * index - 5).slice(0, 5);
+        if (wishlist.length == 0) {
+          message.reply("You have not saved these many papers yet!");
+        } else {
+          for (let i = 0; i < wishlist.length; i += 1) {
+            wishlistEmbed.addFields(
+              {
+                name: "```" + (i + 1) + ") " + wishlist[i].title + "```",
+                value: wishlist[i].description,
+                inline: false,
+              },
+              ////  { name: '\u200B', value: '\u200B' },
+              { name: "Link", value: wishlist[i].link, inline: false }
+            );
+          }
+          message.channel.send({ embeds: [wishlistEmbed] });
         }
-        message.channel.send({ embeds: [wishlistEmbed] });
       } else {
         message.reply(
           "You have no papers saved!\n Use `ylc save` to save a paper!"
@@ -817,8 +824,8 @@ client.on("messageCreate", async function (message) {
       const sub_list = conference_doc.filter(function (conference) {
         return conference.sub === sub;
       });
-      console.log(sub)
-      console.log(sub_list)
+      console.log(sub);
+      console.log(sub_list);
       conference_embed = new MessageEmbed()
         .setColor(colors[Math.floor(Math.random() * colors.length)])
         .setTitle(domains[sub][0])
@@ -834,7 +841,7 @@ client.on("messageCreate", async function (message) {
               sub_list[0].date,
             value: sub_list[0].link,
             inline: false,
-          },
+          }
           ////  { name: '\u200B', value: '\u200B' },
           // {
           //   name:
@@ -869,31 +876,56 @@ client.on("messageCreate", async function (message) {
       .setThumbnail("https://i.imgur.com/eBiE8DT.png")
       .addFields(
         {
-          name: "```" + conference_doc[0].title + "```" + " held from " + conference_doc[0].date,
+          name:
+            "```" +
+            conference_doc[0].title +
+            "```" +
+            " held from " +
+            conference_doc[0].date,
           value: conference_doc[0].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + conference_doc[1].title + "```" + " held from " + conference_doc[1].date,
+          name:
+            "```" +
+            conference_doc[1].title +
+            "```" +
+            " held from " +
+            conference_doc[1].date,
           value: conference_doc[1].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + conference_doc[2].title + "```" + " held from " + conference_doc[2].date,
+          name:
+            "```" +
+            conference_doc[2].title +
+            "```" +
+            " held from " +
+            conference_doc[2].date,
           value: conference_doc[2].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + conference_doc[3].title + "```" + " held from " + conference_doc[3].date,
+          name:
+            "```" +
+            conference_doc[3].title +
+            "```" +
+            " held from " +
+            conference_doc[3].date,
           value: conference_doc[3].link,
           inline: false,
         },
         ////  { name: '\u200B', value: '\u200B' },
         {
-          name: "```" + conference_doc[4].title + "```" + " held from " + conference_doc[4].date,
+          name:
+            "```" +
+            conference_doc[4].title +
+            "```" +
+            " held from " +
+            conference_doc[4].date,
           value: conference_doc[4].link,
           inline: false,
         }
@@ -1373,7 +1405,7 @@ client.on("messageCreate", async function (message) {
           value: "Save the Paper of the Day to read later",
           inline: false,
         },
-        { name: "```saved```", value: "See all saved papers", inline: false },
+        { name: "```saved [number]```", value: "See 5 saved paper for a given page number.\n Ex: ylc saved 1 returns papers 1-5\n       ylc saved 2 returns papers 5-10", inline: false },
         {
           name: "```remove [number]```",
           value: "Remove the saved paper at the given number",
