@@ -1405,7 +1405,12 @@ client.on("messageCreate", async function (message) {
           value: "Save the Paper of the Day to read later",
           inline: false,
         },
-        { name: "```saved [number]```", value: "See 5 saved paper for a given page number.\n Ex: ylc saved 1 returns papers 1-5\n       ylc saved 2 returns papers 5-10", inline: false },
+        {
+          name: "```saved [number]```",
+          value:
+            "See 5 saved paper for a given page number.\n Ex: ylc saved 1 returns papers 1-5\n       ylc saved 2 returns papers 5-10",
+          inline: false,
+        },
         {
           name: "```remove [number]```",
           value: "Remove the saved paper at the given number",
