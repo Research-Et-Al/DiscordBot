@@ -1528,6 +1528,12 @@ client.on("messageCreate", async function (message) {
 
     channel.send({ embeds: [embed] });
   } else if (command === "play") {
+    const voiceChannel = message.member.voice.channel;
+    if (!voiceChannel) {
+      return message.channel.send(
+        "You need to be in a voice channel to play music!"
+      );
+    }
     const connection = joinVoiceChannel({
       channelId: message.member.voice.channel.id,
       guildId: message.guild.id,
