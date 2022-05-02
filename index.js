@@ -1560,7 +1560,7 @@ client.on("messageCreate", async function (message) {
     const yt_embed = new MessageEmbed()
       .setColor("#ff0000")
       .setTitle("Now Playing")
-      .setImage(yt_info[0].thumbnails[1].url)
+      .setImage(yt_info[0].thumbnails[0].url)
       .setURL(yt_info[0].url)
       .setTimestamp()
       .addFields(
