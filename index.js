@@ -1,7 +1,27 @@
 const Discord = require("discord.js");
 const client = new Discord.Client({
-  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS"],
+  intents: [
+    "GUILDS",
+    "GUILD_MESSAGES",
+    "GUILD_MEMBERS",
+    "GUILD_VOICE_STATES",
+    "DIRECT_MESSAGES",
+  ],
+  partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
+const {
+  createAudioPlayer,
+  createAudioResource,
+  StreamType,
+  demuxProbe,
+  joinVoiceChannel,
+  NoSubscriberBehavior,
+  AudioPlayerStatus,
+  VoiceConnectionStatus,
+  getVoiceConnection,
+} = require("@discordjs/voice");
+const ytdl = require("ytdl-core");
+const play = require("play-dl");
 const { MessageEmbed } = require("discord.js");
 const fetch = require("node-fetch");
 const prefix = "ylc";
@@ -1507,6 +1527,135 @@ client.on("messageCreate", async function (message) {
       });
 
     channel.send({ embeds: [embed] });
+  } else if (command === "play") {
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    let args = message.content.split("play")[1];
+    let yt_info = await play.search(args, {
+      limit: 1,
+    });
+
+    let stream = await play.stream(yt_info[0].url);
+
+    let resource = createAudioResource(stream.stream, {
+      inputType: stream.type,
+      outputType: "opus",
+      volume: 0.5,
+    });
+
+    let player = createAudioPlayer({
+      behaviors: {
+        noSubscriber: NoSubscriberBehavior.Play,
+      },
+    });
+    player.play(resource);
+    connection.player = player;
+    connection.subscribe(player);
+    const yt_embed = new MessageEmbed()
+      .setColor("#ff0000")
+      .setTitle("Now Playing")
+      .setImage(yt_info[0].thumbnails[1].url)
+      .setURL(yt_info[0].url)
+      .setTimestamp()
+      .addFields(
+        { name: "Title", value: yt_info[0].title },
+        { name: "Channel", value: yt_info[0].channel.name },
+        { name: "Duration", value: yt_info[0].durationRaw }
+      )
+      .setFooter({
+        text: "Research et Al",
+        iconURL: "https://i.imgur.com/eBiE8DT.png",
+      });
+    message.channel.send({ embeds: [yt_embed] });
+    // message.channel.send("Now Playing " + yt_info[0].title);
+  } else if (command === "stop") {
+    if (!message.member.voice.channel) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    connection.player.stop();
+    message.channel.send("Stopped");
+  } else if (command === "pause") {
+    if (!message.member.voice.channel) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    connection.player.pause(true);
+    message.channel.send("Paused");
+  } else if (command === "resume") {
+    if (!message.member.voice.channel) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    connection.player.unpause();
+    // see all functions in the player
+    message.channel.send("Resumed");
+  } else if (command === "skip") {
+    if (!message.member.voice.channel) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    connection.player.skip();
+    message.channel.send("Skipped");
+  } else if (command === "queue") {
+    if (!message.member.voice.channel) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    const connection = joinVoiceChannel({
+      channelId: message.member.voice.channel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator,
+    });
+    if (!connection) {
+      return message.channel.send("I am not in a voice channel");
+    }
+    let queue = connection.player.queue;
+    let queue_embed = new MessageEmbed()
+      .setColor("#8c52ff")
+      .setTitle("Queue")
+      .setTimestamp()
+      .setFooter({
+        text: "Research et Al",
+        iconURL: "https://i.imgur.com/eBiE8DT.png",
+      });
+    for (let i = 0; i < queue.length; i++) {
+      queue_embed.addField(queue[i].title, queue[i].url, false);
+    }
+    message.channel.send({ embeds: [queue_embed] });
   } else {
     channel.send("I'm sorry I didn't quite get that. Please try again.");
   }
